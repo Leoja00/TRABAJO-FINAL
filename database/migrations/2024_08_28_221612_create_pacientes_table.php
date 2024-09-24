@@ -13,16 +13,8 @@ return new class extends Migration
     {
         Schema::create('pacientes', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('apellido');
-            $table->string('correo')->unique();
-            $table->string('contraseña');
-            $table->string('telefono');
-            $table->unsignedBigInteger('profesional_id');
-            $table->foreign('profesional_id')->references('id')->on('profesionales');
-            $table->date('fecha_nacimiento');
-            $table->string('direccion');
-            $table->string('dni')->unique();
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('obra_social')->nullable();
             $table->string('numero_afiliado')->nullable();
             $table->string('motivo_consulta');

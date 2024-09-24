@@ -13,17 +13,10 @@ return new class extends Migration
     {
         Schema::create('profesionales', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('apellido');
-            $table->string('correo')->unique();
-            $table->string('contraseña');
-            $table->string('telefono');
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('especialidad');
             $table->string('matricula');
-            $table->date('fecha_nacimiento');
-            $table->string('dni')->unique();
-            $table->string('direccion');
-            $table->string('imagen')->nullable();
             $table->timestamps();
         });
     }

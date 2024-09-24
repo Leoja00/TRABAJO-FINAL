@@ -4,34 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Http\Controllers\ProfesionalController;
 
 class Profesional extends Model
 {
     use HasFactory;
-    protected $table = 'profesionales';
 
     protected $fillable = [
-        'nombre',
-        'apellido',
-        'correo',
-        'contraseña',
-        'telefono',
+        'user_id',
         'especialidad',
         'matricula',
-        'fecha_nacimiento',
-        'dni',
-        'direccion',
-        'imagen',
     ];
 
-    protected $hidden = [
-        'contraseña',  // Para ocultar la contraseña en las respuestas JSON
-    ];
-
-    // Relación con Turno: Un profesional tiene muchos turnos
-    public function turnos()
+    public function user()
     {
-        return $this->hasMany(Turno::class);
+        return $this->belongsTo(User::class);
     }
 }

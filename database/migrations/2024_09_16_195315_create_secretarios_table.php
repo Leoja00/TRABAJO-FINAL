@@ -13,14 +13,9 @@ return new class extends Migration
     {
         Schema::create('secretarios', function (Blueprint $table) {
             $table->id();
-            $table->string('nombre');
-            $table->string('apellido');
-            $table->string('correo')->unique();
-            $table->string('contraseña');
-            $table->string('telefono');
-            $table->string('direccion');
-            $table->date('fecha_nacimiento');
-            $table->string('dni')->unique();
+            $table->unsignedBigInteger('user_id');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // Puedes agregar cualquier otro dato adicional específico del secretario aquí
             $table->timestamps();
         });
         

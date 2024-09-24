@@ -2,7 +2,8 @@
     <div class="w-full max-w-screen-xl mx-auto p-4 md:py-8">
         <div class="sm:block sm:items-center sm:justify-center text-center">
             <a href="{{ route('home') }}" class="flex flex-col items-center mb-4 space-y-3 rtl:space-y-reverse">
-                <img src="logo.png" class="h-8 w-auto" alt="Logo">
+                <!-- Cambié la ruta de la imagen -->
+                <img src="{{ asset('img/logo.png') }}" class="h-8 w-auto" alt="Logo">
                 <span class="text-lg md:text-xl lg:text-2xl font-semibold whitespace-nowrap text-white">
                     Consultorio Dra. Adriana Mencarelli
                 </span>

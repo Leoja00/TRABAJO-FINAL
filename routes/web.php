@@ -55,6 +55,9 @@ Route::post('logout', [UserController::class, 'logout'])->name('logout');
 Route::get('/admin/panel', [UserController::class, 'index'])->name('admin.panel')->middleware(middleware: 'auth');
 
 
+Route::put('/admin/change-role/{id}', [UserController::class, 'changeRole'])->name(name: 'admin.changeRole');
+
+
 
 Route::middleware(['auth', 'admin'])->group(function () {
 Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');

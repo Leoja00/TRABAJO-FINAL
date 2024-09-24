@@ -10,7 +10,8 @@
         <div class="relative bg-clip-border rounded-xl bg-white bg-opacity-80 text-gray-700 shadow-md w-full max-w-[68rem] flex mt-40">
             <!-- Imagen -->
             <div class="flex-shrink-0 w-1/3 overflow-hidden rounded-l-xl">
-                <img src="contacto.jpg"  alt="card-image" class="object-cover w-full h-full" />
+                
+            <img src="{{ asset('img/contacto.jpg') }}" alt="card-image" class="object-cover w-full h-full" />
             </div>
             <!-- Texto-->
             <div class="p-6 w-2/3">

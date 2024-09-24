@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('obra_social')->nullable();
             $table->string('numero_afiliado')->nullable();
             $table->string('motivo_consulta');
+            $table->json('profesionales_a_cargo')->nullable(); 
             $table->timestamps();
         });
     }

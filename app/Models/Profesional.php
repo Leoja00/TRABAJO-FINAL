@@ -15,6 +15,9 @@ class Profesional extends Model
         'matricula',
     ];
 
+    // Definir el nombre correcto de la tabla
+    protected $table = 'profesionales';
+
     public function user()
     {
         return $this->belongsTo(User::class);

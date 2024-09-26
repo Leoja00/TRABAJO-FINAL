@@ -3,7 +3,7 @@
 @section('title', 'Contacto')
 
 @section('contenidoHome')
-<div class="relative w-full min-h-screen bg-fixed bg-cover bg-center" style="background-image: url('medico.jpeg');">
+<div class="relative w-full min-h-screen bg-fixed bg-cover bg-center" style="background-image: url('{{ asset('img/medico.jpeg') }}')">
     <!-- Capa de fondo con opacidad -->
     <div class="absolute inset-0 bg-black opacity-50"></div>
     <div class="relative flex items-center justify-center min-h-screen">
@@ -48,7 +48,7 @@
 </div>
 
 <div class="relative w-full bg-fixed bg-cover bg-center"
-        style="background-image:url('medico.jpeg'); height: 115px;">
+        style="background-image:url('{{ asset('img/medico.jpeg') }}'); height: 115px;">
         <div class="absolute inset-0 bg-black opacity-50"></div>
         <div class="relative flex items-center justify-center h-full">
             <div
@@ -70,7 +70,7 @@
             allowfullscreen loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </div>
     <div class="relative w-full h-[5vh] md:h-[10vh] lg:h-[20vh] bg-fixed bg-cover bg-center pb-2"
-     style="background-image:url('pastilla.jpeg');">
+     style="background-image:url('{{ asset('img/pastilla.jpeg') }}');">
     </div>
 
 @endsection

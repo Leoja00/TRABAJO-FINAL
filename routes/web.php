@@ -40,27 +40,39 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/profesional/dashboard', [ProfesionalController::class, 'dashboard'])->name('profesional.dashboard'); // Ajusta según tu necesidad
 
-    // Rutas para el administrador (ajusta según tus necesidades)
-    Route::middleware(['admin'])->group(function () {
-        Route::get('/admin/dashboard', function () {
+    // Rutas para el administrador
+    Route::get('/admin/dashboard', function () {
+        if (Auth::user() && Auth::user()->role === 'admin') {
             return view('admin.dashboard');
-        })->name('admin.dashboard');
-    });
+        }
+        abort(403, 'No tienes permiso para acceder a esta página.');
+    })->name('admin.dashboard');
 });
 
 Route::post('register', [UserController::class, 'register'])->name('register');
 Route::post('login', [UserController::class, 'login'])->name('login.submit');
 Route::post('logout', [UserController::class, 'logout'])->name('logout');
 
-Route::get('/admin/panel', [UserController::class, 'index'])->name('admin.panel')->middleware(middleware: 'auth');
+// Panel del administrador, protegido por autenticación
+Route::get('/admin/panel', [UserController::class, 'index'])->name('admin.panel')->middleware('auth');
 
+// Cambio de rol para el administrador
+Route::put('/admin/change-role/{id}', [UserController::class, 'changeRole'])->name('admin.changeRole');
 
-Route::put('/admin/change-role/{id}', [UserController::class, 'changeRole'])->name(name: 'admin.changeRole');
+    // Rutas para administradores, sin middleware 'admin' pero con verificación
+Route::middleware(['auth'])->group(function () {
+    Route::get('/admin/users', function () {
+        if (Auth::user() && Auth::user()->role === 'admin') {
+            return app(UserController::class)->index();
+        }
+        abort(403, 'No tienes permiso para acceder a esta página.');
+    })->name('admin.users');
+    
+    // Rutas para pacientes, secretarios y profesionales
+    Route::get('/perfil', [UserController::class, 'showProfile'])->name('perfil.show');
+    Route::get('/perfil/completar', [UserController::class, 'completarPerfil'])->name('completar.campos');
 
-
-
-Route::middleware(['auth', 'admin'])->group(function () {
-Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users');
-
+    Route::get('/perfil/editar', [UserController::class, 'editProfile'])->name('perfil.editar');
+    Route::post('/perfil/actualizar', action: [UserController::class, 'updateProfile'])->name('perfil.actualizar');
 });
 

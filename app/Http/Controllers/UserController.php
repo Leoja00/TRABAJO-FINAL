@@ -138,5 +138,84 @@ class UserController extends Controller
     return redirect()->back()->with('success', 'Rol del usuario actualizado y movido a la tabla correspondiente.');
 }
 
+//VER PERFIL
+public function showProfile()
+{
+    $user = Auth::user();
+    return view('perfil', compact('user'));
+}
+
+public function completarPerfil()
+    {
+        $user = Auth::user();
+        return view('perfilCompletar', compact('user'));
+    }
+
+//EDITAR PERFIL
+public function editProfile()
+{
+    $user = Auth::user();
+    return view('perfilEditar', compact('user'));
+}
+
+//ACTUALIZAR PERFIL
+public function updateProfile(Request $request)
+{
+    $user = Auth::user();
+
+    // Validar campos generales
+    $request->validate([
+        'telefono' => 'nullable|string',
+        'fechaNacimiento' => 'nullable|date',
+        'dni' => 'nullable|string|max:20',
+        'direccion' => 'nullable|string|max:255',
+        'especialidad' => 'nullable|string|max:100',
+        'matricula' => 'nullable|string|max:50',
+        'obra_social' => 'nullable|string|max:100',
+        'numero_afiliado' => 'nullable|string|max:50',
+    ]);
+
+    // Guardar campos generales solo si no están vacíos
+    if ($request->filled('telefono')) {
+        $user->telefono = $request->input('telefono');
+    }
+    if ($request->filled('fechaNacimiento')) {
+        $user->fechaNacimiento = $request->input('fechaNacimiento');
+    }
+    if ($request->filled('dni')) {
+        $user->dni = $request->input('dni');
+    }
+    if ($request->filled('direccion')) {
+        $user->direccion = $request->input('direccion');
+    }
+
+    // Guardar campos específicos por rol
+    if ($user->role === 'profesional') {
+        if ($request->filled('especialidad')) {
+            $user->profesional->especialidad = $request->input('especialidad');
+        }
+        if ($request->filled('matricula')) {
+            $user->profesional->matricula = $request->input('matricula');
+        }
+        $user->profesional->save();
+    } elseif ($user->role === 'paciente') {
+        if ($request->filled('obra_social')) {
+            $user->paciente->obra_social = $request->input('obra_social');
+        }
+        if ($request->filled('numero_afiliado')) {
+            $user->paciente->numero_afiliado = $request->input('numero_afiliado');
+        }
+        $user->paciente->save();
+    }
+
+    // Guardar cambios del usuario
+    $user->save();
+
+    return redirect()->route('perfil.show')->with('success', 'Perfil actualizado exitosamente.');
+}
+
+
+
+
 
 }

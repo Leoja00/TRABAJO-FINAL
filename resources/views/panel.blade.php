@@ -28,21 +28,28 @@
                             <td class="py-2 px-4 block md:table-cell" data-label="Email">{{ $user->email }}</td>
                             <td class="py-2 px-4 block md:table-cell" data-label="Rol">{{ $user->role === 'admin' ? 'Administrador' : ucfirst($user->role) }}</td>
                             <td class="py-2 px-4 block md:table-cell" data-label="Acciones">
-                                @if($user->role !== 'admin')
-                                    <form action="{{ route('admin.changeRole', $user->id) }}" method="POST">
-                                        @csrf
-                                        @method('PUT')
-                                        <select name="role" class="border border-gray-300 rounded px-2 py-1">
-                                            <option value="paciente" {{ $user->role === 'paciente' ? 'selected' : '' }}>Paciente</option>
-                                            <option value="profesional" {{ $user->role === 'profesional' ? 'selected' : '' }}>Profesional</option>
-                                            <option value="secretario" {{ $user->role === 'secretario' ? 'selected' : '' }}>Secretario</option>
-                                        </select>
-                                        <button type="submit" class="ml-2 px-4 py-1 bg-teal-700 text-white rounded">Cambiar</button>
-                                    </form>
-                                @else
-                                    <span>-----------------</span> 
-                                @endif
-                            </td>
+    @if($user->role !== 'admin')
+        <form action="{{ route('admin.changeRole', $user->id) }}" method="POST">
+            @csrf
+            @method('PUT')
+            <select name="role" class="border border-gray-300 rounded px-2 py-1">
+                @if($user->role !== 'paciente')
+                    <option value="paciente">Paciente</option>
+                @endif
+                @if($user->role !== 'profesional')
+                    <option value="profesional">Profesional</option>
+                @endif
+                @if($user->role !== 'secretario')
+                    <option value="secretario">Secretario</option>
+                @endif
+            </select>
+            <button type="submit" class="ml-2 px-4 py-1 bg-teal-700 text-white rounded">Cambiar</button>
+        </form>
+    @else
+        <span>-----------------</span> 
+    @endif
+</td>
+
                         </tr>
                     @endforeach
                 </tbody>

@@ -51,10 +51,18 @@
                         <a href="{{ route('admin.panel') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">
                             Administrar usuarios
                         </a>
-                        @endif
                         <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">Cerrar
                             sesión</a>
+                        @else
+                        <a href="{{ route('perfil.show') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">
+                            Ver perfil
+                        </a>
+                        <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">Cerrar
+                            sesión</a>
+                        @endif
                     </div>
+
+
                 </div>
 
                 @else

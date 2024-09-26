@@ -16,6 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password');
+            $table->string('telefono')->nullable();
+            $table->date('fechaNacimiento')->nullable(); 
+            $table->string('dni')->nullable(); 
+            $table->string('direccion')->nullable();
             $table->enum('role', ['paciente', 'profesional', 'secretario', 'admin'])->default('paciente');
             $table->rememberToken();
             $table->timestamps();

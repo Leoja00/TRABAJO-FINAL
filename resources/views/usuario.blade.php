@@ -33,7 +33,8 @@
 
                 <!-- Columna de imagen -->
                 <div class="w-full h-auto bg-gray-400 dark:bg-gray-800 hidden lg:block lg:w-5/12 bg-cover rounded-l-lg opacity-90"
-                    style="background-image: url('login.jpg')"></div>
+     style="background-image: url('{{ asset('img/login.jpg') }}')"></div>
+
                 <!-- Columna del formulario -->
                 <div class="w-full lg:w-7/12 bg-white dark:bg-gray-700 p-5 rounded-lg lg:rounded-l-none">
                     <!-- Formulario de Login -->

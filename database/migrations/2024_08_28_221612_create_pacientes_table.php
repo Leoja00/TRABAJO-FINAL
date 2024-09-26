@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('obra_social')->nullable();
             $table->string('numero_afiliado')->nullable();
-            $table->string('motivo_consulta');
+            $table->string('motivo_consulta')->nullable();
             $table->json('profesionales_a_cargo')->nullable(); 
             $table->timestamps();
         });

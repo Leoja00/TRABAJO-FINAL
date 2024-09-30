@@ -2,12 +2,12 @@
     <div class="container mx-auto flex px-8 xl:px-0">
         <div class="flex flex-grow items-center ml-9">
             <a href="{{ route('home') }}">
-                <!-- Cambié la ruta de la imagen -->
+                
                 <img src="{{ asset('img/logo.png') }}" class="h-12 w-auto" alt="Logo">
             </a>
         </div>
         <div class="flex lg:hidden">
-            <!-- Cambié la ruta de la imagen -->
+
             <img src="{{ asset('img/menu.png') }}" onclick="openMenu();" alt="Menú">
         </div>
         <div id="menu"
@@ -33,7 +33,7 @@
             <div class="flex flex-col lg:flex-row text-center relative">
                 @if (Auth::check())
                 <div class="relative inline-block text-left">
-                    <a href="#" onclick="toggleDropdown(); return false;"
+                    <a href="#" id="userMenuButton"
                         class="{{ request()->routeIs(Auth::user()->role === 'admin' ? 'admin.dashboard' : 'usuario') ? 'text-teal-500 text-m font-bold' : 'text-white text-base' }} text-white border border-white py-2.5 px-5 rounded-md hover:bg-teal-500 hover:text-white hover:border-teal-500 transition duration-500 ease-in-out lg:mr-4 mb-8 lg:mb-0 flex items-center space-x-2 hover:scale-105 transform">
                         <!-- Cambié la ruta de la imagen -->
                         <img src="{{ asset('img/user.png') }}" class="w-6 h-6" alt="Usuario">
@@ -53,6 +53,40 @@
                         </a>
                         <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">Cerrar
                             sesión</a>
+                        @elseif (Auth::user()->role === 'paciente')
+                        <a href="{{ route('perfil.show') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">
+                            Ver perfil
+                        </a>
+                        <a href="{{ route('turno.sacar') }}" 
+                        @php
+                            $missingFieldsPaciente = [];
+                            if (is_null(Auth::user()->paciente->obra_social)) $missingFieldsPaciente['Obra social'] = '';
+                            if (is_null(Auth::user()->paciente->numero_afiliado)) $missingFieldsPaciente['Numero de afiliado'] = '';
+                            if (is_null(Auth::user()->telefono)) $missingFieldsPaciente['telefono'] = '';
+                            if (is_null(Auth::user()->fechaNacimiento)) $missingFieldsPaciente['Fecha de Nacimiento'] = '';
+                            if (is_null(Auth::user()->dni)) $missingFieldsPaciente['dni'] = '';
+                            if (is_null(Auth::user()->direccion)) $missingFieldsPaciente['direccion'] = '';
+                        @endphp
+                        
+                        @if ($missingFieldsPaciente)
+                        onclick="event.preventDefault(); Swal.fire({
+                        icon: 'error',
+                        title: 'ERROR',
+                        html: 'Debe completar los siguientes campos antes de solicitar un turno: <ul><li>{{ implode('</li><li>', array_map(fn($field) => '<strong>' .'*' . ucfirst($field). '</strong>', array_keys($missingFieldsPaciente))) }}</li></ul>',
+                        footer: '<a href=\'{{ route('completar.campos') }}\' style=\'display: inline-block; padding: 10px 15px; background-color: rgb(250 204 21); color: white; text-align: center; border-radius: 5px; text-decoration: none; font-weight: bold;\'>Completar perfil</a>'
+                    });"
+
+                            class="block px-4 py-2 text-sm hover:bg-gray-600"
+                        @else
+                            class="block px-4 py-2 text-sm hover:bg-gray-600"
+                        @endif
+                    >
+                        Solicitar turno
+                    </a>
+
+
+                        <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">Cerrar
+                            sesión</a>
                         @else
                         <a href="{{ route('perfil.show') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">
                             Ver perfil
@@ -61,14 +95,12 @@
                             sesión</a>
                         @endif
                     </div>
-
-
                 </div>
 
                 @else
                 <a href="{{ route('usuario') }}"
                     class="{{ request()->routeIs('usuario') ? 'text-teal-500 text-m font-bold' : 'text-white text-base' }} text-white border border-white py-2.5 px-5 rounded-md hover:bg-teal-500 hover:text-white hover:border-teal-500 transition duration-500 ease-in-out lg:mr-4 mb-8 lg:mb-0 flex items-center space-x-2 hover:scale-105 transform">
-                    <!-- Cambié la ruta de la imagen -->
+
                     <img src="{{ asset('img/user.png') }}" class="w-6 h-6" alt="Usuario">
                     <span>Usuario</span>
                 </a>
@@ -78,9 +110,14 @@
     </div>
 </nav>
 
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 <script>
-function toggleDropdown() {
-    const dropdown = document.getElementById('dropdown');
-    dropdown.classList.toggle('hidden');
+window.onload = function() {
+    document.getElementById('userMenuButton').addEventListener('click', function(e) {
+        e.preventDefault();
+        const dropdown = document.getElementById('dropdown');
+        dropdown.classList.toggle('hidden');
+    });
 }
 </script>

@@ -1,9 +1,11 @@
 <?php
 
+use App\Http\Controllers\PacienteController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfesionalController;
-use App\Http\Controllers\UserController; // Asegúrate de importar tu controlador de usuarios
+use App\Http\Controllers\UserController; 
+
 
 Route::get('/', function () {
     return view('home');
@@ -74,5 +76,15 @@ Route::middleware(['auth'])->group(function () {
 
     Route::get('/perfil/editar', [UserController::class, 'editProfile'])->name('perfil.editar');
     Route::post('/perfil/actualizar', action: [UserController::class, 'updateProfile'])->name('perfil.actualizar');
+
+    //TURNOS
+    //SACAR TURNO
+    Route::middleware(['auth'])->group(function () {
+        Route::get('/turno', [PacienteController::class, 'reservarTurno'])->name('turno.sacar');
+        Route::post('/turno', [PacienteController::class, 'guardarTurno'])->name('turno.guardar');
+    });
+
 });
+
+
 

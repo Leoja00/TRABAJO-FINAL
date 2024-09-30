@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
+
 
 class UserController extends Controller
 {
@@ -75,12 +77,11 @@ class UserController extends Controller
         return redirect()->route('home')->with('message', 'Has cerrado sesión exitosamente.');
     }
 
-    // Nuevo método para cambiar el rol de un usuario
     public function changeRole(Request $request, $id)
 {
     $authUser = Auth::user();
 
-    // Verificar que no sea un paciente quien intenta cambiar roles
+    
     if ($authUser->role === 'paciente') {
         return redirect()->back()->withErrors(['unauthorized' => 'No tienes permiso para realizar esta acción.']);
     }
@@ -117,7 +118,8 @@ class UserController extends Controller
         \DB::table('profesionales')->insert([
             'user_id' => $user->id,
             'especialidad' => null, 
-            'matricula'=> null, 
+            'matricula'=> null,
+            'imagen'=> null,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -171,6 +173,7 @@ public function updateProfile(Request $request)
         'direccion' => 'nullable|string|max:255',
         'especialidad' => 'nullable|string|max:100',
         'matricula' => 'nullable|string|max:50',
+        'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'obra_social' => 'nullable|string|max:100',
         'numero_afiliado' => 'nullable|string|max:50',
     ]);
@@ -197,8 +200,25 @@ public function updateProfile(Request $request)
         if ($request->filled('matricula')) {
             $user->profesional->matricula = $request->input('matricula');
         }
+        if ($request->hasFile('imagen')) {
+            // Comprobar si ya existe una imagen y eliminarla
+            if ($user->profesional->imagen) {
+                // Eliminar la imagen anterior del almacenamiento
+                Storage::disk('public')->delete($user->profesional->imagen);
+            }
+    
+            // Almacenar la nueva imagen
+            $image = $request->file('imagen');
+            $imagePath = $image->store('img/profesionales', 'public'); 
+            
+            // Actualizar la propiedad de imagen
+            $user->profesional->imagen = $imagePath; 
+        }
+        
+        // Guardar los cambios en el profesional
         $user->profesional->save();
-    } elseif ($user->role === 'paciente') {
+    }
+    elseif ($user->role === 'paciente') {
         if ($request->filled('obra_social')) {
             $user->paciente->obra_social = $request->input('obra_social');
         }

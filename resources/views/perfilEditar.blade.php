@@ -16,9 +16,9 @@
                         <h1 class="text-3xl font-bold pt-8 lg:pt-0">{{ Auth::user()->name }}</h1>
                         <div class="mx-auto lg:mx-0 w-4/5 pt-3 border-b-2 border-green-500 opacity-25"></div>
 
-                        <form action="{{ route('perfil.actualizar') }}" method="POST">
+                        <form action="{{ route('perfil.actualizar') }}" method="POST" enctype="multipart/form-data">
                             @csrf
-                           
+
 
                             <!-- Campos generales del usuario -->
                             <div class="mb-4">
@@ -58,6 +58,19 @@
                                     class="border rounded w-full py-2 px-3"
                                     value="{{ old('matricula', Auth::user()->profesional->matricula) }}">
                             </div>
+                            <div class="mb-4">
+                                <label for="imagen">Imagen:</label>
+                                <input type="file" name="imagen" id="imagen" class="border rounded w-full py-2 px-3">
+                            </div>
+                            @if (Auth::user()->profesional->imagen)
+                            <div class="mb-4">
+                                <label>Imagen actual:</label>
+                                <div>
+                                    <img src="{{ asset('storage/'. Auth::user()->profesional->imagen) }}"
+                                        alt="Imagen actual" class="w-32 h-32 object-cover">
+                                </div>
+                            </div>
+                            @endif
                             @elseif (Auth::user()->role === 'paciente')
                             <div class="mb-4">
                                 <label for="obra_social">Obra Social:</label>

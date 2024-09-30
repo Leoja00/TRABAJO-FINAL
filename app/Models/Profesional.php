@@ -13,6 +13,7 @@ class Profesional extends Model
         'user_id',
         'especialidad',
         'matricula',
+        'imagen',
     ];
 
     // Definir el nombre correcto de la tabla

@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('especialidad')->nullable();   
             $table->string('matricula')->nullable();
-
+            $table->string('imagen')->nullable();
             $table->timestamps();
         });
     }

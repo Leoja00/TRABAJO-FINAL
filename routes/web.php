@@ -5,6 +5,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfesionalController;
 use App\Http\Controllers\UserController; 
+use App\Http\Controllers\ObraSocialController;
+
+
 
 
 Route::get('/', function () {
@@ -17,9 +20,8 @@ Route::get('/contacto', function () {
     return view('contacto');
 })->name('contacto');
 
-Route::get('/cobertura', function () {
-    return view('cobertura');
-})->name('cobertura');
+Route::get('/cobertura', [ObraSocialController::class, 'index'])->name('cobertura');
+
 
 Route::get('/usuario', function () {
     return view('usuario');

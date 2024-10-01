@@ -33,8 +33,9 @@
                 if (Auth::user()->role === 'paciente') {
                 if (is_null(Auth::user()->paciente->obra_social)) {
                 $missingFields[] = 'obra social';
-                }
-                if (is_null(Auth::user()->paciente->numero_afiliado)) {
+                } else if (Auth::user()->paciente->obra_social !== 'SIN PREPAGA' &&
+                is_null(Auth::user()->paciente->numero_afiliado)) {
+                
                 $missingFields[] = 'número de afiliado';
                 }
                 }
@@ -190,21 +191,21 @@
             </div>
 
             @if (Auth::user()->role === 'profesional')
-    <div class="w-full lg:w-2/5">
-        @php
-            $image = Auth::user()->profesional->imagen;
-        @endphp
-        
-        @if ($image)
-            <img src="{{ asset('storage/' . $image) }}" 
-                 class="rounded-none lg:rounded-lg shadow-2xl hidden lg:block">
-        @else
-            <div class="text-center">
-                <p class="text-gray-600 text-lg">Imagen de {{ Auth::user()->name }}</p>
+            <div class="w-full lg:w-2/5">
+                @php
+                $image = Auth::user()->profesional->imagen;
+                @endphp
+
+                @if ($image)
+                <img src="{{ asset('storage/' . $image) }}"
+                    class="rounded-none lg:rounded-lg shadow-2xl hidden lg:block">
+                @else
+                <div class="text-center">
+                    <p class="text-gray-600 text-lg">Imagen de {{ Auth::user()->name }}</p>
+                </div>
+                @endif
             </div>
-        @endif
-    </div>
-@endif
+            @endif
 
 
 

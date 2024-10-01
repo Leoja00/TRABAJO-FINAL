@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Http\Controllers\ObraSocialController;
+use App\Models\ObraSocial;
 
 
 class UserController extends Controller
@@ -150,14 +152,16 @@ public function showProfile()
 public function completarPerfil()
     {
         $user = Auth::user();
-        return view('perfilCompletar', compact('user'));
+    $obrasSociales = ObraSocial::all(); // Obtén todas las obras sociales
+    return view('perfilCompletar', compact('user', 'obrasSociales'));
     }
 
 //EDITAR PERFIL
 public function editProfile()
 {
     $user = Auth::user();
-    return view('perfilEditar', compact('user'));
+    $obrasSociales = ObraSocial::all(); // Obtén todas las obras sociales
+    return view('perfilEditar', compact('user' , 'obrasSociales'));
 }
 
 //ACTUALIZAR PERFIL

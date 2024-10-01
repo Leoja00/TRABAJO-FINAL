@@ -60,29 +60,30 @@
                         <a href="{{ route('turno.sacar') }}" 
                         @php
                             $missingFieldsPaciente = [];
-                            if (is_null(Auth::user()->paciente->obra_social)) $missingFieldsPaciente['Obra social'] = '';
-                            if (is_null(Auth::user()->paciente->numero_afiliado)) $missingFieldsPaciente['Numero de afiliado'] = '';
-                            if (is_null(Auth::user()->telefono)) $missingFieldsPaciente['telefono'] = '';
-                            if (is_null(Auth::user()->fechaNacimiento)) $missingFieldsPaciente['Fecha de Nacimiento'] = '';
-                            if (is_null(Auth::user()->dni)) $missingFieldsPaciente['dni'] = '';
-                            if (is_null(Auth::user()->direccion)) $missingFieldsPaciente['direccion'] = '';
+                            if (Auth::user()->paciente->obra_social !== 'SIN PREPAGA') {
+                                if (is_null(Auth::user()->paciente->obra_social)) $missingFieldsPaciente['Obra social'] = '';
+                                if (is_null(Auth::user()->paciente->numero_afiliado)) $missingFieldsPaciente['Numero de afiliado'] = '';
+                                if (is_null(Auth::user()->telefono)) $missingFieldsPaciente['telefono'] = '';
+                                if (is_null(Auth::user()->fechaNacimiento)) $missingFieldsPaciente['Fecha de Nacimiento'] = '';
+                                if (is_null(Auth::user()->dni)) $missingFieldsPaciente['dni'] = '';
+                                if (is_null(Auth::user()->direccion)) $missingFieldsPaciente['direccion'] = '';
+                            }
                         @endphp
-                        
-                        @if ($missingFieldsPaciente)
+                                                
+                                                @if ($missingFieldsPaciente)
                         onclick="event.preventDefault(); Swal.fire({
                         icon: 'error',
                         title: 'ERROR',
                         html: 'Debe completar los siguientes campos antes de solicitar un turno: <ul><li>{{ implode('</li><li>', array_map(fn($field) => '<strong>' .'*' . ucfirst($field). '</strong>', array_keys($missingFieldsPaciente))) }}</li></ul>',
                         footer: '<a href=\'{{ route('completar.campos') }}\' style=\'display: inline-block; padding: 10px 15px; background-color: rgb(250 204 21); color: white; text-align: center; border-radius: 5px; text-decoration: none; font-weight: bold;\'>Completar perfil</a>'
-                    });"
-
+                        });"
                             class="block px-4 py-2 text-sm hover:bg-gray-600"
                         @else
                             class="block px-4 py-2 text-sm hover:bg-gray-600"
                         @endif
-                    >
+                        >
                         Solicitar turno
-                    </a>
+                        </a>
 
 
                         <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">Cerrar

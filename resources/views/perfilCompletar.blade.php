@@ -29,8 +29,8 @@
                         $missingFields['matricula'] = '';
                         }
                         if (is_null(Auth::user()->profesional->imagen)) {
-                            $missingFields['imagen'] = '';
-                            }
+                        $missingFields['imagen'] = '';
+                        }
                         }
 
                         if (Auth::user()->role === 'paciente') {
@@ -124,24 +124,34 @@
                             @break
 
 
-
                             @case('obra_social')
                             <div class="mb-4">
                                 <label for="obra_social">Obra Social:</label>
-                                <input type="text" name="obra_social" id="obra_social"
+                                <input list="obras_sociales" name="obra_social" id="obra_social"
                                     class="border rounded w-full py-2 px-3"
-                                    value="{{ old('obra_social', Auth::user()->paciente->obra_social) }}">
+                                    value="{{ old('obra_social', Auth::user()->paciente->obra_social ? Auth::user()->paciente->obra_social->nombre : '') }}"
+                                    onchange="checkPrepaga()">
+
+                                <datalist id="obras_sociales">
+                                    @foreach($obrasSociales as $obra)
+                                    <option value="{{ $obra->nombre }}"></option>
+                                    @endforeach
+                                </datalist>
                             </div>
+
                             @break
 
                             @case('numero_afiliado')
-                            <div class="mb-4">
+                            <div class="mb-4" id="numero_afiliado_div"
+                                style="display: {{ old('obra_social', Auth::user()->paciente->obra_social) == 'SIN PREPAGA' ? 'none' : 'block' }}">
                                 <label for="numero_afiliado">Número de Afiliado:</label>
                                 <input type="text" name="numero_afiliado" id="numero_afiliado"
                                     class="border rounded w-full py-2 px-3"
                                     value="{{ old('numero_afiliado', Auth::user()->paciente->numero_afiliado) }}">
                             </div>
+
                             @break
+
                             @endswitch
                             @endforeach
 
@@ -166,4 +176,24 @@
         </div>
     </div>
 </div>
+<script>
+function checkPrepaga() {
+    const obraSocialInput = document.getElementById('obra_social');
+    const numeroAfiliadoDiv = document.getElementById('numero_afiliado_div');
+    const numeroAfiliadoInput = document.getElementById('numero_afiliado');
+
+    // Verificar si se selecciona "SIN PREPAGA"
+    if (obraSocialInput.value === 'SIN PREPAGA') {
+        numeroAfiliadoDiv.style.display = 'none'; // Ocultar el campo
+        numeroAfiliadoInput.value = ''; // Limpiar el valor
+        numeroAfiliadoInput.disabled = true; // Deshabilitar el campo
+    } else {
+        numeroAfiliadoDiv.style.display = 'block'; // Mostrar el campo
+        numeroAfiliadoInput.disabled = false; // Habilitar el campo
+    }
+}
+</script>
+
+
+
 @endsection

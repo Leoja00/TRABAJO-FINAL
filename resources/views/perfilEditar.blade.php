@@ -19,7 +19,6 @@
                         <form action="{{ route('perfil.actualizar') }}" method="POST" enctype="multipart/form-data">
                             @csrf
 
-
                             <!-- Campos generales del usuario -->
                             <div class="mb-4">
                                 <label for="telefono">Teléfono:</label>
@@ -74,15 +73,22 @@
                             @elseif (Auth::user()->role === 'paciente')
                             <div class="mb-4">
                                 <label for="obra_social">Obra Social:</label>
-                                <input type="text" name="obra_social" id="obra_social"
+                                <input list="obras_sociales" name="obra_social" id="obra_social"
                                     class="border rounded w-full py-2 px-3"
-                                    value="{{ old('obra_social', Auth::user()->paciente->obra_social) }}">
+                                    value="{{ old('obra_social', Auth::user()->paciente->obra_social ? Auth::user()->paciente->obra_social : '') }}"
+                                    oninput="checkPrepaga()">
+                                <datalist id="obras_sociales">
+                                    @foreach($obrasSociales as $obra)
+                                    <option value="{{ $obra->nombre }}"></option>
+                                    @endforeach
+                                </datalist>
                             </div>
                             <div class="mb-4">
                                 <label for="numero_afiliado">Número de Afiliado:</label>
                                 <input type="text" name="numero_afiliado" id="numero_afiliado"
                                     class="border rounded w-full py-2 px-3"
-                                    value="{{ old('numero_afiliado', Auth::user()->paciente->numero_afiliado) }}">
+                                    value="{{ old('numero_afiliado', Auth::user()->paciente->numero_afiliado) }}"
+                                    {{ old('obra_social', Auth::user()->paciente->obra_social) == 'SIN PREPAGA' ? 'disabled' : '' }}>
                             </div>
                             @endif
 
@@ -98,4 +104,17 @@
         </div>
     </div>
 </div>
+<script>
+    function checkPrepaga() {
+        const obraSocialSelect = document.getElementById('obra_social');
+        const numeroAfiliadoInput = document.getElementById('numero_afiliado');
+
+        if (obraSocialSelect.value === 'SIN PREPAGA') {
+            numeroAfiliadoInput.value = ''; // Limpiar el campo
+            numeroAfiliadoInput.disabled = true; // Desactivar el campo
+        } else {
+            numeroAfiliadoInput.disabled = false; // Activar el campo
+        }
+    }
+</script>
 @endsection

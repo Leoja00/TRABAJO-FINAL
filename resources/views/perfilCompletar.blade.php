@@ -68,7 +68,8 @@
                             <div class="mb-4">
                                 <label for="telefono">Teléfono:</label>
                                 <input type="text" name="telefono" id="telefono" class="border rounded w-full py-2 px-3"
-                                    value="{{ old('telefono', Auth::user()->telefono) }}">
+                                    value="{{ old('telefono', Auth::user()->telefono) }}" pattern="[0-9]{6,10}"
+                                    title="Solo números, entre 6 y 10 caracteres">
                             </div>
                             @break
 
@@ -77,7 +78,8 @@
                                 <label for="fechaNacimiento">Fecha de Nacimiento:</label>
                                 <input type="date" name="fechaNacimiento" id="fechaNacimiento"
                                     class="border rounded w-full py-2 px-3"
-                                    value="{{ old('fechaNacimiento', Auth::user()->fechaNacimiento) }}">
+                                    value="{{ old('fechaNacimiento', Auth::user()->fechaNacimiento) }}"
+                                    max="{{ date('Y-m-d') }}">
                             </div>
                             @break
 
@@ -85,7 +87,8 @@
                             <div class="mb-4">
                                 <label for="dni">DNI:</label>
                                 <input type="text" name="dni" id="dni" class="border rounded w-full py-2 px-3"
-                                    value="{{ old('dni', Auth::user()->dni) }}">
+                                    value="{{ old('dni', Auth::user()->dni) }}" pattern="[0-9]{7,9}"
+                                    title="Solo números, entre 7 y 9 caracteres">
                             </div>
                             @break
 
@@ -94,7 +97,8 @@
                                 <label for="direccion">Dirección:</label>
                                 <input type="text" name="direccion" id="direccion"
                                     class="border rounded w-full py-2 px-3"
-                                    value="{{ old('direccion', Auth::user()->direccion) }}">
+                                    value="{{ old('direccion', Auth::user()->direccion) }}" minlength="5" maxlength="40"
+                                    title="Entre 5 y 40 caracteres">
                             </div>
                             @break
 
@@ -147,8 +151,11 @@
                                 <label for="numero_afiliado">Número de Afiliado:</label>
                                 <input type="text" name="numero_afiliado" id="numero_afiliado"
                                     class="border rounded w-full py-2 px-3"
-                                    value="{{ old('numero_afiliado', Auth::user()->paciente->numero_afiliado) }}">
+                                    value="{{ old('numero_afiliado', Auth::user()->paciente->numero_afiliado) }}"
+                                    pattern="[0-9]{8,10}" title="Solo números, entre 8 y 10 caracteres"
+                                    {{ Auth::user()->paciente->obra_social == 'SIN PREPAGA' ? 'disabled' : '' }}>
                             </div>
+
 
                             @break
 

@@ -8,7 +8,8 @@
         </div>
         <div class="flex lg:hidden">
 
-            <img src="{{ asset('img/menu.png') }}" onclick="openMenu();" alt="Menú">
+        <img src="{{ asset('img/menu2.png') }}" onclick="openMenu();" alt="Menú" style="width: 40px; height: 40px;">
+
         </div>
         <div id="menu"
             class="lg:flex hidden flex-grow justify-between absolute lg:relative lg:top-0 top-20 left-0 bg-gray-800 w-full lg:w-auto items-center py-14 lg:py-0 px-8 sm:px-24 lg:px-0 transition-all duration-500 ease-in-out">

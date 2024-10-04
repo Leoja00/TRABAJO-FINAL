@@ -65,11 +65,12 @@
                             <div class="mb-4">
                                 <label>Imagen actual:</label>
                                 <div>
-                                    <img src="{{ asset('storage/'. Auth::user()->profesional->imagen) }}"
-                                        alt="Imagen actual" class="w-32 h-32 object-cover">
+                                    <img src="{{ asset(Auth::user()->profesional->imagen) }}" alt="Imagen actual"
+                                        class="w-32 h-32 object-cover">
                                 </div>
                             </div>
                             @endif
+
                             @elseif (Auth::user()->role === 'paciente')
                             <div class="mb-4">
                                 <label for="obra_social">Obra Social:</label>
@@ -105,16 +106,16 @@
     </div>
 </div>
 <script>
-    function checkPrepaga() {
-        const obraSocialSelect = document.getElementById('obra_social');
-        const numeroAfiliadoInput = document.getElementById('numero_afiliado');
+function checkPrepaga() {
+    const obraSocialSelect = document.getElementById('obra_social');
+    const numeroAfiliadoInput = document.getElementById('numero_afiliado');
 
-        if (obraSocialSelect.value === 'SIN PREPAGA') {
-            numeroAfiliadoInput.value = ''; // Limpiar el campo
-            numeroAfiliadoInput.disabled = true; // Desactivar el campo
-        } else {
-            numeroAfiliadoInput.disabled = false; // Activar el campo
-        }
+    if (obraSocialSelect.value === 'SIN PREPAGA') {
+        numeroAfiliadoInput.value = ''; // Limpiar el campo
+        numeroAfiliadoInput.disabled = true; // Desactivar el campo
+    } else {
+        numeroAfiliadoInput.disabled = false; // Activar el campo
     }
+}
 </script>
 @endsection

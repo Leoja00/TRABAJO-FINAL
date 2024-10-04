@@ -22,17 +22,22 @@ class UserController extends Controller
 
     public function register(Request $request)
 {
+    // Validación del registro
     $validator = Validator::make($request->all(), [
-        'name' => 'required|string|max:255',
-        'email' => 'required|string|email|max:255|unique:users',
-        'password' => 'required|string|min:6|confirmed',
+        'name' => ['required', 'string', 'regex:/^[\pL\s]+$/u', 'max:255'], // Solo letras y espacios
+        'email' => 'required|string|email|max:255|unique:users', // Verifica que el correo sea único
+        'password' => 'required|string|min:6|confirmed', // Confirmed verifica que password_confirmation coincida
+    ], [
+        'name.regex' => 'El nombre solo puede contener letras y espacios.',
+        'email.unique' => 'El correo ya está registrado.', 
+        'password.confirmed' => 'Las contraseñas no son iguales.',
     ]);
 
     if ($validator->fails()) {
-        return back()->withErrors($validator)->withInput();
+        return back()->withErrors($validator, 'register')->withInput()->with('signupError', true);
     }
 
-    // Crear el usuario
+    // Crea el usuario
     $user = User::create([
         'name' => $request->name, 
         'email' => $request->email,
@@ -41,7 +46,7 @@ class UserController extends Controller
     ]);
 
     if ($user) {
-
+        // tabla "pacientes"
         \DB::table('pacientes')->insert([
             'user_id' => $user->id,
             'obra_social' => null,
@@ -51,7 +56,7 @@ class UserController extends Controller
             'updated_at' => now(),
         ]);
     } else {
-        return back()->withErrors(['register' => 'Error al registrar el usuario.']);
+        return back()->withErrors(['register' => 'Error al registrar el usuario.'], 'register')->with('signupError', true);
     }
 
     Auth::login($user);
@@ -60,18 +65,37 @@ class UserController extends Controller
 
 
 
-    public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
 
-        if (Auth::attempt($credentials)) {
-            return redirect()->route('app');
-        }
+public function login(Request $request)
+{
+    // Valida el campo email y password
+    $request->validate([
+        'email' => 'required|string|email',
+        'password' => 'required|string',
+    ]);
 
+    // Verifica si el correo existe
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+        // Si el correo no existe
         return back()->withErrors([
-            'email' => 'Las credenciales proporcionadas son incorrectas.',
-        ]);
+            'email' => 'Correo no registrado.',
+        ], 'login')->with('signupError', false);
     }
+
+    // Correo existe, pero la contraseña es incorrecta
+    if (!Auth::attempt($request->only('email', 'password'))) {
+        return back()->withErrors([
+            'password' => 'Las credenciales proporcionadas son incorrectas.',
+        ], 'login')->with('signupError', false);
+    }
+
+    // Login exitoso
+    return redirect()->route('app');
+}
+
+
 
     public function logout(Request $request)
     {
@@ -152,7 +176,7 @@ public function showProfile()
 public function completarPerfil()
     {
         $user = Auth::user();
-    $obrasSociales = ObraSocial::all(); // Obtén todas las obras sociales
+    $obrasSociales = ObraSocial::all(); // Todas las obras sociales
     return view('perfilCompletar', compact('user', 'obrasSociales'));
     }
 
@@ -160,7 +184,7 @@ public function completarPerfil()
 public function editProfile()
 {
     $user = Auth::user();
-    $obrasSociales = ObraSocial::all(); // Obtén todas las obras sociales
+    $obrasSociales = ObraSocial::all(); // Todas las obras sociales
     return view('perfilEditar', compact('user' , 'obrasSociales'));
 }
 
@@ -171,15 +195,15 @@ public function updateProfile(Request $request)
 
     // Validar campos generales
     $request->validate([
-        'telefono' => 'nullable|string',
-        'fechaNacimiento' => 'nullable|date',
-        'dni' => 'nullable|string|max:20',
-        'direccion' => 'nullable|string|max:255',
+        'telefono' => 'nullable|numeric|digits_between:6,10',
+        'fechaNacimiento' => 'nullable|date|before:today',
+        'dni' => 'nullable|numeric|digits_between:7,9',
+        'direccion' => 'nullable|string|min:5|max:40',
         'especialidad' => 'nullable|string|max:100',
         'matricula' => 'nullable|string|max:50',
         'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'obra_social' => 'nullable|string|max:100',
-        'numero_afiliado' => 'nullable|string|max:50',
+        'numero_afiliado' => 'nullable|numeric|digits_between:8,10|required_if:obra_social,!SIN PREPAGA',
     ]);
 
     // Guardar campos generales solo si no están vacíos
@@ -205,30 +229,32 @@ public function updateProfile(Request $request)
             $user->profesional->matricula = $request->input('matricula');
         }
         if ($request->hasFile('imagen')) {
-            // Comprobar si ya existe una imagen y eliminarla
-            if ($user->profesional->imagen) {
-                // Eliminar la imagen anterior del almacenamiento
-                Storage::disk('public')->delete($user->profesional->imagen);
+            // Si hay imagen previa, eliminarla
+            if ($user->profesional->imagen && file_exists(public_path($user->profesional->imagen))) {
+                unlink(public_path($user->profesional->imagen));
             }
-    
-            // Almacenar la nueva imagen
+
+            // Guardar nueva imagen
             $image = $request->file('imagen');
-            $imagePath = $image->store('img/profesionales', 'public'); 
-            
-            // Actualizar la propiedad de imagen
-            $user->profesional->imagen = $imagePath; 
+            $imageName = time() . '-' . $image->getClientOriginalName(); 
+            $imagePath = 'img/profesionales/' . $imageName;
+            $image->move(public_path('img/profesionales'), $imageName);
+            $user->profesional->imagen = $imagePath;
         }
-        
-        // Guardar los cambios en el profesional
         $user->profesional->save();
     }
     elseif ($user->role === 'paciente') {
         if ($request->filled('obra_social')) {
             $user->paciente->obra_social = $request->input('obra_social');
         }
-        if ($request->filled('numero_afiliado')) {
+
+        // Si la obra social es SIN PREPAGA, dejar numero_afiliado en NULL
+        if ($request->input('obra_social') === 'SIN PREPAGA') {
+            $user->paciente->numero_afiliado = null;
+        } else if ($request->filled('numero_afiliado')) {
             $user->paciente->numero_afiliado = $request->input('numero_afiliado');
         }
+        
         $user->paciente->save();
     }
 
@@ -237,6 +263,7 @@ public function updateProfile(Request $request)
 
     return redirect()->route('perfil.show')->with('success', 'Perfil actualizado exitosamente.');
 }
+
 
 
 

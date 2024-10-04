@@ -46,7 +46,7 @@
 
     <!-- Nuestro consultorio -->
     <div class="relative w-full bg-fixed bg-cover bg-center"
-        style="background-image:url('pastilla.jpeg'); height: 115px;">
+        style="background-image:url('{{('img/pastilla.jpeg')}}'); height: 115px;">
         <div class="absolute inset-0 bg-black opacity-50"></div>
         <div class="relative flex items-center justify-center h-full">
             <div
@@ -70,6 +70,7 @@
 
     <!-- Resto de la imagen -->
     <div class="relative w-full h-[5vh] md:h-[10vh] lg:h-[20vh] bg-fixed bg-cover bg-center pb-2"
-     style="background-image:url('pastilla.jpeg');">
-    </div>
+     style="background-image: url('{{ asset('img/pastilla.jpeg') }}');">
+</div>
+
 @endsection

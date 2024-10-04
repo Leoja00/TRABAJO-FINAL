@@ -15,14 +15,14 @@
 
                 <!-- Switch -->
                 <div class="relative inline-block select-none transition duration-200 ease-in">
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="checkbox" id="toggle" class="sr-only peer" onclick="toggleForms()"
-                            @if(session('signupError')) checked @endif>
-                        <div
-                            class="relative w-14 h-7 bg-teal-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 dark:peer-focus:ring-teal-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all dark:border-gray-600 peer-checked:bg-teal-600">
-                        </div>
-                    </label>
-                </div>
+    <label class="inline-flex items-center cursor-pointer">
+        <input type="checkbox" id="toggle" class="sr-only peer" onclick="toggleForms()"
+            @if(session('signupError')) checked @endif>
+        <div
+            class="relative w-14 h-7 bg-teal-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-teal-300 rounded-full peer-checked:bg-teal-600 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all">
+        </div>
+    </label>
+</div>
 
                 <a href="#" id="signupLink"
                     class="text-lg font-bold transition-colors duration-300 text-teal-500 hover:text-teal-700"
@@ -39,17 +39,16 @@
                             <div class="w-full flex">
                                 <div class="w-1/2 hidden lg:block bg-cover rounded-l-lg opacity-90"
                                     style="background-image: url('{{ asset('img/login.jpg') }}');"></div>
-                                <div class="w-full lg:w-1/2 bg-white dark:bg-gray-700 p-5 rounded-lg lg:rounded-l-none">
-                                    <h3 class="py-4 text-2xl text-center text-gray-800 dark:text-white">Iniciar sesión
-                                    </h3>
-                                    <form class="px-8 pt-6 pb-8 mb-4 bg-white dark:bg-gray-800 rounded" method="POST"
+                                <div class="w-full lg:w-1/2 bg-white p-5 rounded-lg lg:rounded-l-none">
+                                    <h3 class="py-4 text-2xl text-center text-gray-800">Iniciar sesión</h3>
+                                    <form class="px-8 pt-6 pb-8 mb-4 bg-white rounded" method="POST"
                                         action="{{ route('login.submit') }}">
                                         @csrf
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
+                                            <label class="block mb-2 text-sm font-bold text-gray-700"
                                                 for="email">Correo</label>
                                             <input
-                                                class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                 id="email" name="email" type="email" placeholder="Email" required />
                                             @if ($errors->login->has('email'))
                                             <p class="text-xs italic text-red-500">{{ $errors->login->first('email') }}
@@ -57,22 +56,26 @@
                                             @endif
                                         </div>
                                         <div class="mb-4 relative">
-    <label class="block mb-2 text-sm font-bold text-gray-700 dark:text-white" for="password">Contraseña</label>
-    <input class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-           id="passwordLogin" name="password" type="password" placeholder="******************" required />
-    <!-- Icono de ojo -->
-    <span class="password-eye-icon" onclick="togglePassword('passwordLogin', this)">
-        <i class="far fa-eye" id="togglePasswordIconLogin"></i>
-    </span>
-    @if ($errors->login->has('password'))
-        <p class="text-xs italic text-red-500">{{ $errors->login->first('password') }}</p>
-    @endif
-</div>
-
+                                            <label class="block mb-2 text-sm font-bold text-gray-700"
+                                                for="password">Contraseña</label>
+                                            <input
+                                                class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                id="passwordLogin" name="password" type="password"
+                                                placeholder="******************" required />
+                                            <!-- Icono de ojo -->
+                                            <span class="password-eye-icon"
+                                                onclick="togglePassword('passwordLogin', this)">
+                                                <i class="far fa-eye" id="togglePasswordIconLogin"></i>
+                                            </span>
+                                            @if ($errors->login->has('password'))
+                                            <p class="text-xs italic text-red-500">
+                                                {{ $errors->login->first('password') }}</p>
+                                            @endif
+                                        </div>
 
                                         <div class="mb-6 text-center">
                                             <button
-                                                class="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 dark:bg-blue-700 dark:text-white dark:hover:bg-blue-900 focus:outline-none focus:shadow-outline"
+                                                class="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
                                                 type="submit">Ingresar</button>
                                         </div>
                                     </form>
@@ -86,17 +89,16 @@
                             <div class="w-full flex">
                                 <div class="w-1/2 hidden lg:block bg-cover rounded-l-lg opacity-90"
                                     style="background-image: url('{{ asset('img/login.jpg') }}');"></div>
-                                <div class="w-full lg:w-1/2 bg-white dark:bg-gray-700 p-5 rounded-lg lg:rounded-l-none">
-                                    <h3 class="py-4 text-2xl text-center text-gray-800 dark:text-white">Crear una cuenta
-                                    </h3>
-                                    <form class="px-8 pt-6 pb-8 mb-4 bg-white dark:bg-gray-800 rounded" method="POST"
+                                <div class="w-full lg:w-1/2 bg-white p-5 rounded-lg lg:rounded-l-none">
+                                    <h3 class="py-4 text-2xl text-center text-gray-800">Crear una cuenta</h3>
+                                    <form class="px-8 pt-6 pb-8 mb-4 bg-white rounded" method="POST"
                                         action="{{ route('register') }}">
                                         @csrf
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
+                                            <label class="block mb-2 text-sm font-bold text-gray-700"
                                                 for="name">Nombre</label>
                                             <input
-                                                class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                 id="name" name="name" type="text" placeholder="Nombre completo"
                                                 required />
                                             @if ($errors->register->has('name'))
@@ -105,10 +107,10 @@
                                             @endif
                                         </div>
                                         <div class="mb-4">
-                                            <label class="block mb-2 text-sm font-bold text-gray-700 dark:text-white"
+                                            <label class="block mb-2 text-sm font-bold text-gray-700"
                                                 for="emailSignUp">Correo</label>
                                             <input
-                                                class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
                                                 id="emailSignUp" name="email" type="email" placeholder="Email"
                                                 required />
                                             @if ($errors->register->has('email'))
@@ -118,34 +120,44 @@
                                         </div>
 
                                         <div class="mb-4 relative">
-    <label class="block mb-2 text-sm font-bold text-gray-700 dark:text-white" for="passwordSignUp">Contraseña</label>
-    <input class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-           id="passwordSignUp" name="password" type="password" placeholder="******************" required />
-    <!-- Icono de ojo -->
-    <span class="password-eye-icon" onclick="togglePassword('passwordSignUp', this)">
-        <i class="far fa-eye" id="togglePasswordIconSignUp"></i>
-    </span>
-    @if ($errors->register->has('password'))
-        <p class="text-xs italic text-red-500">{{ $errors->register->first('password') }}</p>
-    @endif
-</div>
+                                            <label class="block mb-2 text-sm font-bold text-gray-700"
+                                                for="passwordSignUp">Contraseña</label>
+                                            <input
+                                                class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                id="passwordSignUp" name="password" type="password"
+                                                placeholder="******************" required />
+                                            <!-- Icono de ojo -->
+                                            <span class="password-eye-icon"
+                                                onclick="togglePassword('passwordSignUp', this)">
+                                                <i class="far fa-eye" id="togglePasswordIconSignUp"></i>
+                                            </span>
+                                            @if ($errors->register->has('password'))
+                                            <p class="text-xs italic text-red-500">
+                                                {{ $errors->register->first('password') }}</p>
+                                            @endif
+                                        </div>
 
-<div class="mb-4 relative">
-    <label class="block mb-2 text-sm font-bold text-gray-700 dark:text-white" for="password_confirmation">Confirmar Contraseña</label>
-    <input class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 dark:text-white border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
-           id="password_confirmation" name="password_confirmation" type="password" placeholder="******************" required />
-    <!-- Icono de ojo -->
-    <span class="password-eye-icon" onclick="togglePassword('password_confirmation', this)">
-        <i class="far fa-eye" id="togglePasswordIconConfirmation"></i>
-    </span>
-    @if ($errors->register->has('password_confirmation'))
-        <p class="text-xs italic text-red-500">{{ $errors->register->first('password_confirmation') }}</p>
-    @endif
-</div>
+                                        <div class="mb-4 relative">
+                                            <label class="block mb-2 text-sm font-bold text-gray-700"
+                                                for="password_confirmation">Confirmar Contraseña</label>
+                                            <input
+                                                class="w-full px-3 py-2 mb-3 text-sm leading-tight text-gray-700 border rounded shadow appearance-none focus:outline-none focus:shadow-outline"
+                                                id="password_confirmation" name="password_confirmation" type="password"
+                                                placeholder="******************" required />
+                                            <!-- Icono de ojo -->
+                                            <span class="password-eye-icon"
+                                                onclick="togglePassword('password_confirmation', this)">
+                                                <i class="far fa-eye" id="togglePasswordIconConfirmation"></i>
+                                            </span>
+                                            @if ($errors->register->has('password_confirmation'))
+                                            <p class="text-xs italic text-red-500">
+                                                {{ $errors->register->first('password_confirmation') }}</p>
+                                            @endif
+                                        </div>
 
                                         <div class="mb-6 text-center">
                                             <button
-                                                class="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 dark:bg-blue-700 dark:text-white dark:hover:bg-blue-900 focus:outline-none focus:shadow-outline"
+                                                class="w-full px-4 py-2 font-bold text-white bg-blue-500 rounded-full hover:bg-blue-700 focus:outline-none focus:shadow-outline"
                                                 type="submit">Registrarse</button>
                                         </div>
                                     </form>
@@ -197,23 +209,19 @@
     transform: rotateY(180deg);
 }
 
-
 .password-eye-icon {
     position: absolute;
-    top: 50%;  
-    right: 1rem;  
-    transform: translateY(-20%);  
+    top: 50%;
+    right: 1rem;
+    transform: translateY(-20%);
     cursor: pointer;
-    color: #6b7280;  
+    color: #6b7280;
 }
 
 input[type="password"] {
-    line-height: 1.6;  
-    padding-right: 2.5rem; 
+    line-height: 1.6;
+    padding-right: 2.5rem;
 }
-
-
-
 </style>
 
 <script>
@@ -245,6 +253,5 @@ function togglePassword(inputId, icon) {
         iconElement.classList.add('fa-eye');
     }
 }
-
 </script>
 @endsection

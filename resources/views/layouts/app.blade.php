@@ -62,7 +62,7 @@
             copyrightElement.innerHTML =
                 `© ${year} <a href="https://github.com/Leoja00" target="_blank" class="hover:underline">Leonardo Gallardo</a>. Derechos reservados.`;
         });
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+       
     </script>
 </body>
 </html>

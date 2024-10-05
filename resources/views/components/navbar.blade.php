@@ -50,34 +50,37 @@
                         </a>
                         <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">Cerrar
                             sesión</a>
-                        @elseif (Auth::user()->role === 'paciente')
+                        @elseif (Auth::user()->role === 'paciente' || Auth::user()->role === 'secretario')
                         <a href="{{ route('perfil.show') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">
                             Ver perfil
                         </a>
-                        <a href="{{ route('turno.sacar') }}" 
+
                         @php
-                            $missingFieldsPaciente = [];
-                            if (Auth::user()->paciente->obra_social !== 'SIN PREPAGA') {
-                                if (is_null(Auth::user()->paciente->obra_social)) $missingFieldsPaciente['Obra social'] = '';
-                                if (is_null(Auth::user()->paciente->numero_afiliado)) $missingFieldsPaciente['Numero de afiliado'] = '';
-                                if (is_null(Auth::user()->telefono)) $missingFieldsPaciente['telefono'] = '';
-                                if (is_null(Auth::user()->fechaNacimiento)) $missingFieldsPaciente['Fecha de Nacimiento'] = '';
-                                if (is_null(Auth::user()->dni)) $missingFieldsPaciente['dni'] = '';
-                                if (is_null(Auth::user()->direccion)) $missingFieldsPaciente['direccion'] = '';
-                            }
+                        $missingFields = [];
+
+                        // Verificar los campos faltantes según el rol
+                        if (Auth::user()->role === 'paciente' && Auth::user()->paciente->obra_social !== 'SIN PREPAGA')
+                        {
+                        // Si no es "SIN PREPAGA", verificar todos los campos necesarios
+                        if (is_null(Auth::user()->paciente->obra_social)) $missingFields['Obra social'] = '';
+                        if (is_null(Auth::user()->paciente->numero_afiliado)) $missingFields['Número de afiliado'] = '';
+                        }
+
+                        // Verificar los campos para ambos roles (secretario y paciente)
+                        if (is_null(Auth::user()->telefono)) $missingFields['Teléfono'] = '';
+                        if (is_null(Auth::user()->fechaNacimiento)) $missingFields['Fecha de Nacimiento'] = '';
+                        if (is_null(Auth::user()->dni)) $missingFields['DNI'] = '';
+                        if (is_null(Auth::user()->direccion)) $missingFields['Dirección'] = '';
                         @endphp
-                        @if ($missingFieldsPaciente)
-                            onclick="event.preventDefault(); Swal.fire({
-                            icon: 'error',
-                            title: 'ERROR',
-                            html: 'Debe completar los siguientes campos antes de solicitar un turno: <ul><li>{{ implode('</li><li>', array_map(fn($field) => '<strong>' .'*' . ucfirst($field). '</strong>', array_keys($missingFieldsPaciente))) }}</li></ul>',
-                            footer: '<a href=\'{{ route('completar.campos') }}\' style=\'display: inline-block; padding: 10px 15px; background-color: rgb(250 204 21); color: white; text-align: center; border-radius: 5px; text-decoration: none; font-weight: bold;\'>Completar perfil</a>'
-                            });"
-                        @else
-                            class="block px-4 py-2 text-sm hover:bg-gray-600"
-                        @endif
-                        >
-                        Solicitar turno
+
+                        <a href="{{ route('turno.sacar') }}" @if ($missingFields) onclick="event.preventDefault(); Swal.fire({
+                icon: 'error',
+                title: 'ERROR',
+                html: 'Debe completar los siguientes campos antes de {{ Auth::user()->role === 'secretario' ? 'agendar' : 'solicitar' }} un turno: <ul><li>{{ implode('</li><li>', array_map(fn($field) => '<strong>' .'*' . ucfirst($field). '</strong>', array_keys($missingFields))) }}</li></ul>',
+                footer: '<a href=\'{{ route('completar.campos') }}\' style=\'display: inline-block; padding: 10px 15px; background-color: rgb(250 204 21); color: white; text-align: center; border-radius: 5px; text-decoration: none; font-weight: bold;\'>Completar perfil</a>'
+                });" @else class="block px-4 py-2 text-sm hover:bg-gray-600" @endif
+                            class="{{ $missingFields ? 'text-white text-sm' : 'text-teal-500 text-sm font-bold' }} transition-all duration-300 ease-in-out hover:scale-105 transform block px-3 py-2 hover:bg-gray-600">
+                            {{ Auth::user()->role === 'secretario' ? 'Agendar turno' : 'Solicitar turno' }}
                         </a>
                         <a href="{{ route('logout') }}" class="block px-4 py-2 text-sm hover:bg-gray-600">Cerrar
                             sesión</a>
@@ -89,6 +92,7 @@
                             sesión</a>
                         @endif
                     </div>
+
                 </div>
                 @else
                 <a href="{{ route('usuario') }}"

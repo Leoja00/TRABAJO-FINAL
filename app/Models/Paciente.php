@@ -20,4 +20,9 @@ class Paciente extends Model
     {
         return $this->belongsTo(User::class);
     }
+    public function turnos()
+{
+    return $this->hasMany(Turno::class);
+}
+
 }

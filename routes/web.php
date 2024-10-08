@@ -4,8 +4,9 @@ use App\Http\Controllers\PacienteController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\ProfesionalController;
-use App\Http\Controllers\UserController; 
+use App\Http\Controllers\UserController;
 use App\Http\Controllers\ObraSocialController;
+use App\Http\Controllers\TurnoController;
 
 
 
@@ -29,12 +30,12 @@ Route::get('/usuario', function () {
 
 // Rutas para la autenticación
 Route::get('/login', function () {
-    return view('login'); // Asegúrate de tener esta vista
+    return view('usuario');
 })->name('login');
 
 Route::post('/login', [UserController::class, 'login'])->name('login.submit');
 
-Route::get('/logout', [UserController::class, 'logout'])->name('logout'); // Ruta para cerrar sesión
+Route::get('/logout', [UserController::class, 'logout'])->name('logout');
 
 // Rutas protegidas por autenticación
 Route::middleware(['auth'])->group(function () {
@@ -63,7 +64,7 @@ Route::get('/admin/panel', [UserController::class, 'index'])->name('admin.panel'
 // Cambio de rol para el administrador
 Route::put('/admin/change-role/{id}', [UserController::class, 'changeRole'])->name('admin.changeRole');
 
-    // Rutas para administradores, sin middleware 'admin' pero con verificación
+// Rutas para administradores, sin middleware 'admin' pero con verificación
 Route::middleware(['auth'])->group(function () {
     Route::get('/admin/users', function () {
         if (Auth::user() && Auth::user()->role === 'admin') {
@@ -71,7 +72,7 @@ Route::middleware(['auth'])->group(function () {
         }
         abort(403, 'No tienes permiso para acceder a esta página.');
     })->name('admin.users');
-    
+
     // Rutas para pacientes, secretarios y profesionales
     Route::get('/perfil', [UserController::class, 'showProfile'])->name('perfil.show');
     Route::get('/perfil/completar', [UserController::class, 'completarPerfil'])->name('completar.campos');
@@ -82,9 +83,14 @@ Route::middleware(['auth'])->group(function () {
     //TURNOS
     //SACAR TURNO
     Route::middleware(['auth'])->group(function () {
-        Route::get('/turno', [PacienteController::class, 'reservarTurno'])->name('turno.sacar');
-        Route::post('/turno', [PacienteController::class, 'guardarTurno'])->name('turno.guardar');
+        Route::get('/turnos/reservar', [TurnoController::class, 'reservarTurno'])->name('turno.sacar');
+        Route::post('/turnos/reservar', [TurnoController::class, 'guardarTurno'])->name('turno.guardar');
+        Route::post('/turnos/horarios-disponibles', [TurnoController::class, 'getHorariosDisponibles'])->name('getHorariosDisponibles');
     });
+    Route::get('/turnos/reservar', [TurnoController::class, 'reservarTurno'])->name('turno.sacar');
+    Route::post('/turnos/reservar', [TurnoController::class, 'guardarTurno'])->name('turno.guardar');
+    Route::get('/turnos/horarios-disponibles', [TurnoController::class, 'getHorariosDisponibles']);
+
 
 });
 

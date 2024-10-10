@@ -86,10 +86,14 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/turnos/reservar', [TurnoController::class, 'reservarTurno'])->name('turno.sacar');
         Route::post('/turnos/reservar', [TurnoController::class, 'guardarTurno'])->name('turno.guardar');
         Route::post('/turnos/horarios-disponibles', [TurnoController::class, 'getHorariosDisponibles'])->name('getHorariosDisponibles');
-    });
+        Route::post('/verificar-dni', [TurnoController::class, 'verificarDni'])->name('verificarDni');
+
+        });
     Route::get('/turnos/reservar', [TurnoController::class, 'reservarTurno'])->name('turno.sacar');
     Route::post('/turnos/reservar', [TurnoController::class, 'guardarTurno'])->name('turno.guardar');
     Route::get('/turnos/horarios-disponibles', [TurnoController::class, 'getHorariosDisponibles']);
+    Route::post('/verificar-dni', [TurnoController::class, 'verificarDni'])->name('verificarDni');
+
 
 
 });

@@ -75,7 +75,7 @@
             @if(Auth::user()->role === 'secretario')
                 <div class="mt-6">
                     <label for="dni" class="block text-lg font-medium mb-2 text-white">DNI del Paciente:</label>
-                    <input type="text" id="dni" name="dni" class="border p-2 rounded w-full" required>
+                    <input type="text" id="dni" name="dni" class="border p-2 rounded w-full" required pattern="^\d{7,9}$" title="Debe contener entre 7 y 9 números" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
                     @error('dni')
                         <span class="text-red-500 text-sm">{{ $message }}</span>
                     @enderror

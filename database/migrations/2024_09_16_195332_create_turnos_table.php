@@ -27,7 +27,6 @@ return new class extends Migration
             $table->string('dni_paciente_no_registrado')->nullable(); // Campo para DNI de pacientes no registrados
             $table->timestamps();
         });
-        
     }
 
     /**

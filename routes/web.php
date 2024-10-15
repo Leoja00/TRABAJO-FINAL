@@ -11,9 +11,9 @@ use App\Http\Controllers\TurnoController;
 
 
 
-Route::get('/', function () {
-    return view('home');
-})->name('home');
+Route::get('/', [PageController::class, 'home'])->name('home');
+
+
 
 Route::get('/profesionales', [ProfesionalController::class, 'index'])->name('profesionales');
 
@@ -81,18 +81,18 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/perfil/actualizar', action: [UserController::class, 'updateProfile'])->name('perfil.actualizar');
 
     //TURNOS
-    //SACAR TURNO
     Route::middleware(['auth'])->group(function () {
         Route::get('/turnos/reservar', [TurnoController::class, 'reservarTurno'])->name('turno.sacar');
         Route::post('/turnos/reservar', [TurnoController::class, 'guardarTurno'])->name('turno.guardar');
         Route::post('/turnos/horarios-disponibles', [TurnoController::class, 'getHorariosDisponibles'])->name('getHorariosDisponibles');
         Route::post('/verificar-dni', [TurnoController::class, 'verificarDni'])->name('verificarDni');
+        Route::get('/turnos/ver', [TurnoController::class, 'verTurnos'])->name('turnos.ver');
+
+        Route::get('/turnos/solicited', [TurnoController::class, 'verTurnosSecretarios'])->name('turnos.secretario');
+        
 
         });
-    Route::get('/turnos/reservar', [TurnoController::class, 'reservarTurno'])->name('turno.sacar');
-    Route::post('/turnos/reservar', [TurnoController::class, 'guardarTurno'])->name('turno.guardar');
-    Route::get('/turnos/horarios-disponibles', [TurnoController::class, 'getHorariosDisponibles']);
-    Route::post('/verificar-dni', [TurnoController::class, 'verificarDni'])->name('verificarDni');
+
 
 
 

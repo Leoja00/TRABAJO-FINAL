@@ -21,16 +21,19 @@ class Turno extends Model
     // Relaciones
     public function paciente()
 {
-    return $this->belongsTo(Paciente::class);
+    return $this->belongsTo(Paciente::class,'paciente_id');
 }
 
 public function profesional()
 {
-    return $this->belongsTo(Profesional::class);
+    return $this->belongsTo(Profesional::class, 'profesional_id');
 }
 
 public function secretario()
 {
     return $this->belongsTo(User::class, 'secretario_id');
+}
+public function user() {
+    return $this->belongsTo(User::class);
 }
 }

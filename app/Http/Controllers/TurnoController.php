@@ -22,8 +22,30 @@ class TurnoController extends Controller
         $this->turnoService = $turnoService;
     }
 
+    public function verPacientesProfesional() {
+        //LLAMADO AL SERVICE PARA ACTUALIZAR EL ESTADO
+        $this->turnoService->actualizarTurnosCompletados();
+        if (!Auth::check() || Auth::user()->role !== 'profesional') {
+            return redirect()->route('home'); 
+        }
+    
+        $isMobile = request()->header('User-Agent') && preg_match('/Mobile|Android|iPhone/', request()->header('User-Agent'));
+        $perPage = $isMobile ? 3 : 10;
+        $turnos = Auth::user()->profesional->turnos()->with('paciente')->paginate($perPage);
+    
+        return view('pacientesAdheridosProfesional', compact('turnos'));
+    }
+    
+
+
     public function verTurnosSecretarios() {
-        // Cargar todos los turnos junto con las relaciones de profesional, paciente y usuario
+
+        if (!Auth::check() || Auth::user()->role !== 'secretario') {
+            return redirect()->route('home'); 
+        }
+        //LLAMADO AL SERVICE PARA ACTUALIZAR EL ESTADO
+        $this->turnoService->actualizarTurnosCompletados();
+        //Turnos junto con las relaciones de profesional, paciente y usuario
         $turnos = Turno::with(['profesional', 'paciente', 'user'])->get(); 
         
         return view('turnosTodosSecretarios', compact('turnos'));
@@ -45,6 +67,10 @@ class TurnoController extends Controller
 
     public function reservarTurno(Request $request)
     {
+        if (!Auth::check() || (Auth::user()->role !== 'secretario' && Auth::user()->role !== 'paciente')) {
+            return redirect()->route('home'); 
+        }
+        
 
         $fecha = $request->input('fecha', Carbon::today()->toDateString());
 

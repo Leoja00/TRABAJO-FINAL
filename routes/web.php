@@ -89,9 +89,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/turnos/ver', [TurnoController::class, 'verTurnos'])->name('turnos.ver');
 
         Route::get('/turnos/solicited', [TurnoController::class, 'verTurnosSecretarios'])->name('turnos.secretario');
-        
-
         });
+        Route::get('/pacientes/adherid', [TurnoController::class, 'verPacientesProfesional'])->name('pacientes.profesional');
 
 
 

@@ -22,11 +22,9 @@
                     Horario de atención
                 </h4>
                 <p class="block mb-1 font-sans text-base antialiased font-normal leading-relaxed text-gray-700">
-                    Lunes a viernes 08:30-13:00 / 16:00-20:00
+                    Lunes a viernes 08:30-12:30 / 17:00-20:00
                 </p>
-                <p class="block mb-8 font-sans text-base antialiased font-normal leading-relaxed text-gray-700">
-                    Sábado 09:00-13:00
-                </p>
+
                 <h6 class="block mb-2 font-sans text-base antialiased font-semibold leading-relaxed tracking-normal text-gray-700 uppercase">
                     Dirección
                 </h6>

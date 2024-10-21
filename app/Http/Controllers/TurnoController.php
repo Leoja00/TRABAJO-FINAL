@@ -116,7 +116,7 @@ public function verTurnosSecretarios()
 
         $profesionales = Profesional::all();
 
-        $horariosDisponibles = $this->generarHorariosDisponibles($fecha);
+        $horariosDisponibles = $this->generarHorariosDisponibles($fecha, $request->profesional_id);
 
         return view('turno', compact('fecha', 'horariosDisponibles', 'profesionales'));
     }
@@ -256,7 +256,7 @@ public function verTurnosSecretarios()
         $profesionalId = $request->input('profesional_id');
 
         // Generar los horarios disponibles
-        $horariosDisponibles = $this->generarHorariosDisponibles($fecha);
+        $horariosDisponibles = $this->generarHorariosDisponibles($fecha, $request->profesional_id);
 
         // Devolver los horarios disponibles en formato JSON
         return response()->json(['horariosDisponibles' => $horariosDisponibles]);
@@ -304,57 +304,118 @@ public function verTurnosSecretarios()
     
 
 
-    private function generarHorariosDisponibles($fecha)
-    {
-        $horarios = [
-            'manana' => [],
-            'tarde' => [],
-        ];
+    private function generarHorariosDisponibles($fecha, $profesionalId)
+{
+    $horarios = [
+        'manana' => [],
+        'tarde' => [],
+    ];
+    date_default_timezone_set('America/Argentina/Buenos_Aires');
 
-        $bloques = [
-            ['nombre' => 'manana', 'inicio' => '08:30', 'fin' => '12:30'],
-            ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00'],
-        ];
 
-        $hoy = Carbon::today()->toDateString();
-        $ahora = Carbon::now()->subHours(3)->format('H:i');
-        //echo "<script>console.log('$ahora');</script>";
+    
+    $hoy = Carbon::today()->toDateString();
+    $ahora = Carbon::now()->format('H:i');  
 
-        foreach ($bloques as $bloque) {
-            $period = CarbonPeriod::create(
-                Carbon::createFromFormat('Y-m-d H:i', "$fecha {$bloque['inicio']}"),
-                '15 minutes',
-                Carbon::createFromFormat('Y-m-d H:i', "$fecha {$bloque['fin']}")
-            );
+    $diaSemana = Carbon::parse($fecha)->dayOfWeek;
 
-            foreach ($period as $time) {
-                if ($fecha === $hoy && $time->format('H:i') <= $ahora) {
-                    continue;
-                }
-
-                if ($time->format('H:i') === $bloque['fin']) {
-                    continue;
-                }
-
-                $horarios[$bloque['nombre']][] = $time->format('H:i');
+    
+    switch ($profesionalId) {
+        case 1: // Adriana
+            if (in_array($diaSemana, [Carbon::MONDAY, Carbon::WEDNESDAY])) {
+                // Adriana todo el día (mañana y tarde) LUNES Y MIERCOLES
+                $bloques = [
+                    ['nombre' => 'manana', 'inicio' => '08:30', 'fin' => '12:30'],
+                    ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00'],
+                ];
+            } elseif ($diaSemana === Carbon::THURSDAY) {
+                // Adriana por la tarde JUEVES
+                $bloques = [
+                    ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00'],
+                ];
+            } elseif ($diaSemana === Carbon::FRIDAY) {
+                // Adriana por la mañana VIERNES
+                $bloques = [
+                    ['nombre' => 'manana', 'inicio' => '08:30', 'fin' => '12:30'],
+                ];
+            } else {
+                // No disponible en otros días
+                return $horarios;
             }
-        }
+            break;
+        
+        
+        case 3: // Psicólogo
+            if ($diaSemana === Carbon::FRIDAY) {
+                // Psicólogo por la tarde (cada 45 minutos) VIERNES
+                $bloques = [
+                    ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00', 'intervalo' => '45 minutes'],
+                ];
+            } else {
+                return $horarios;
+            }
+            break;
+        
+        case 2: // Lars
+            if ($diaSemana === Carbon::TUESDAY) {
+                // Lars por la tarde MARTES
+                $bloques = [
+                    ['nombre' => 'tarde', 'inicio' => '17:30', 'fin' => '20:00'],
+                ];
+            } else {
+                return $horarios;
+            }
+            break;
 
-        $reservados = Turno::whereDate('dia_hora', $fecha) // Filtrar por la fecha (Y-m-d)
-            ->where('estado', 'reservado') // Turnos reservados
-            ->pluck('dia_hora')
-            ->map(function ($item) {
-                return Carbon::parse($item)->format('H:i');
-            })
-            ->toArray();
+        default:
 
-        // Horarios disponibles, menos los reservados
-        foreach (['manana', 'tarde'] as $turno) {
-            $horarios[$turno] = array_values(array_diff($horarios[$turno], $reservados));
-        }
-
-        return $horarios;
+            return $horarios;
     }
+
+    // Generar los periodos según los bloques definidos
+    foreach ($bloques as $bloque) {
+        $intervalo = isset($bloque['intervalo']) ? $bloque['intervalo'] : '15 minutes';
+        
+        $period = CarbonPeriod::create(
+            Carbon::createFromFormat('Y-m-d H:i', "$fecha {$bloque['inicio']}"),
+            $intervalo,
+            Carbon::createFromFormat('Y-m-d H:i', "$fecha {$bloque['fin']}")
+        );
+
+        foreach ($period as $time) {
+            // Saltar solo los horarios pasados si es el día actual
+            if ($fecha === $hoy && $time->format('H:i') <= $ahora) {
+                continue; // Saltar los horarios anteriores a la hora actual
+            }
+
+            // Excluir la hora final del bloque
+            if ($time->format('H:i') === $bloque['fin']) {
+                continue;
+            }
+
+            $horarios[$bloque['nombre']][] = $time->format('H:i');
+        }
+    }
+
+    // Filtrar los horarios reservados
+    $reservados = Turno::whereDate('dia_hora', $fecha)
+        ->where('profesional_id', $profesionalId) // Filtrar por profesional
+        ->where('estado', 'reservado')
+        ->pluck('dia_hora')
+        ->map(function ($item) {
+            return Carbon::parse($item)->format('H:i');
+        })
+        ->toArray();
+
+    // Eliminar horarios reservados de los disponibles
+    foreach (['manana', 'tarde'] as $turno) {
+        $horarios[$turno] = array_values(array_diff($horarios[$turno], $reservados));
+    }
+
+    return $horarios;
+}
+
+
 
 
     public function actualizarTurnosCompletados()

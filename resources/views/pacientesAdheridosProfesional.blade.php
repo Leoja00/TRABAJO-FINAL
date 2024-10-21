@@ -56,13 +56,16 @@
                                             </td>
                                             <td class="py-2 px-4 block md:table-cell" style="font-weight: 500;" data-label="Paciente"
                                                 data-dni="{{ $turno->paciente->user->dni ?? $turno->dni_paciente_no_registrado }}">
-                                                {{ $turno->paciente->user->name ?? $turno->dni_paciente_no_registrado }} <br>
-                                                <small>
-                                                    DNI: <span style="font-weight:700">
-                                                        {{ $turno->paciente->user->dni ?? $turno->dni_paciente_no_registrado }}
-                                                    </span>
-                                                </small>
+                                                @if($turno->paciente)
+                                                    {{ $turno->paciente->user->name }} <br>
+                                                    <small>DNI: <span style="font-weight:700">{{ $turno->paciente->user->dni }}</span></small>
+                                                @else
+                                                    {{ $turno->paciente_no_registrado_nombre }} <br>
+                                                    <small>DNI: <span
+                                                            style="font-weight:700">{{ $turno->dni_paciente_no_registrado }}</span></small>
+                                                @endif
                                             </td>
+
 
                                             <td class="py-2 px-4 block md:table-cell" data-label="Estado">
                                                 @if($turno->estado === 'completado')
@@ -129,7 +132,7 @@
         const dniSearch = document.getElementById('dniSearch');
         const clearSearch = document.getElementById('clearSearch');
         const turnosTableBody = document.getElementById('turnosTableBody');
-        const originalRows = Array.from(turnosTableBody.querySelectorAll('tr')); 
+        const originalRows = Array.from(turnosTableBody.querySelectorAll('tr'));
 
         // Filtrar por DNI mientras el usuario escribe
         dniSearch.addEventListener('input', function () {
@@ -153,7 +156,7 @@
 
         clearSearch.addEventListener('click', function () {
             dniSearch.value = '';
-            dniSearch.dispatchEvent(new Event('input')); 
+            dniSearch.dispatchEvent(new Event('input'));
         });
 
 
@@ -164,9 +167,9 @@
         clearSearch.style.display = dniSearch.value ? 'block' : 'none';
 
         function resetTable() {
-            turnosTableBody.innerHTML = ''; 
+            turnosTableBody.innerHTML = '';
             originalRows.forEach(row => {
-                turnosTableBody.appendChild(row); 
+                turnosTableBody.appendChild(row);
                 row.style.display = '';
             });
         }

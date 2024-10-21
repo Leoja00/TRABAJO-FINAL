@@ -12,6 +12,7 @@ use App\Models\Paciente;
 use App\Models\User;
 use App\Models\Secretario;
 use App\Services\TurnoService;
+use Illuminate\Support\Facades\DB;
 
 class TurnoController extends Controller
 {
@@ -22,34 +23,72 @@ class TurnoController extends Controller
         $this->turnoService = $turnoService;
     }
 
-    public function verPacientesProfesional() {
-        //LLAMADO AL SERVICE PARA ACTUALIZAR EL ESTADO
-        $this->turnoService->actualizarTurnosCompletados();
-        if (!Auth::check() || Auth::user()->role !== 'profesional') {
-            return redirect()->route('home'); 
-        }
-    
-        $isMobile = request()->header('User-Agent') && preg_match('/Mobile|Android|iPhone/', request()->header('User-Agent'));
-        $perPage = $isMobile ? 3 : 10;
-        $turnos = Auth::user()->profesional->turnos()->with('paciente')->paginate($perPage);
-    
-        return view('pacientesAdheridosProfesional', compact('turnos'));
+    public function verPacientesProfesional()
+{
+
+    $this->turnoService->actualizarTurnosCompletados();
+
+    if (!Auth::check() || Auth::user()->role !== 'profesional') {
+        return redirect()->route('home');
     }
+
+    $isMobile = request()->header('User-Agent') && preg_match('/Mobile|Android|iPhone/', request()->header('User-Agent'));
+    $perPage = $isMobile ? 3 : 10;
+
+    $turnos = Auth::user()->profesional->turnos()->with(['paciente'])->paginate($perPage);
+
+    foreach ($turnos as $turno) {
+        if (!$turno->paciente && $turno->dni_paciente_no_registrado) {
+            // Buscar en la tabla 'pacientes_no_logueados' usando el DNI
+            $pacienteNoRegistrado = DB::table('pacientes_no_logueados')
+                ->where('dni', $turno->dni_paciente_no_registrado)
+                ->first();
+
+
+            if ($pacienteNoRegistrado) {
+                $turno->paciente_no_registrado_nombre = $pacienteNoRegistrado->name; 
+            } else {
+                $turno->paciente_no_registrado_nombre = 'No Registrado';
+            }
+        }
+    }
+
+    return view('pacientesAdheridosProfesional', compact('turnos'));
+}
+
     
 
 
-    public function verTurnosSecretarios() {
-
-        if (!Auth::check() || Auth::user()->role !== 'secretario') {
-            return redirect()->route('home'); 
-        }
-        //LLAMADO AL SERVICE PARA ACTUALIZAR EL ESTADO
-        $this->turnoService->actualizarTurnosCompletados();
-        //Turnos junto con las relaciones de profesional, paciente y usuario
-        $turnos = Turno::with(['profesional', 'paciente', 'user'])->get(); 
-        
-        return view('turnosTodosSecretarios', compact('turnos'));
+public function verTurnosSecretarios()
+{
+    if (!Auth::check() || Auth::user()->role !== 'secretario') {
+        return redirect()->route('home');
     }
+
+    // LLAMADO AL SERVICE PARA ACTUALIZAR EL ESTADO
+    $this->turnoService->actualizarTurnosCompletados();
+
+    // Turnos junto con las relaciones de profesional, paciente y usuario
+    $turnos = Turno::with(['profesional', 'paciente', 'user'])->get();
+
+    foreach ($turnos as $turno) {
+        if (!$turno->paciente && $turno->dni_paciente_no_registrado) {
+            // Buscar en la tabla 'pacientes_no_logueados' usando el DNI
+            $pacienteNoRegistrado = DB::table('pacientes_no_logueados')
+                ->where('dni', $turno->dni_paciente_no_registrado)
+                ->first();
+
+            if ($pacienteNoRegistrado) {
+                $turno->paciente_no_registrado_nombre = $pacienteNoRegistrado->name;
+            } else {
+                $turno->paciente_no_registrado_nombre = 'No Registrado';
+            }
+        }
+    }
+
+    return view('turnosTodosSecretarios', compact('turnos'));
+}
+
     
 
     public function verTurnos()
@@ -229,22 +268,41 @@ class TurnoController extends Controller
         $request->validate([
             'dni' => 'required|string',
         ]);
-
+    
         $dni = $request->input('dni');
-
+    
+        // Verificar si el DNI está en la tabla de usuarios
         $usuario = User::where('dni', $dni)->first();
-
+    
         if ($usuario) {
             return response()->json([
                 'existe' => true,
                 'nombre' => $usuario->name,
             ]);
-        } else {
+        }
+    
+        // Verificar si el DNI está en la tabla de pacientes_no_logueados
+        $pacienteNoLogueado = DB::table('pacientes_no_logueados')->where('dni', $dni)->first();
+    
+        if ($pacienteNoLogueado) {
             return response()->json([
-                'existe' => false,
+                'existe' => true,
+                'nombre' => $pacienteNoLogueado->name,
             ]);
         }
+    
+        // Obtener las obras sociales de la tabla obras_sociales
+        $obrasSociales = DB::table('obras_sociales')->pluck('nombre');
+    
+        // Si no se encuentra en ninguna tabla
+        return response()->json([
+            'existe' => false,
+            'registrar' => true,
+            'obrasSociales' => $obrasSociales,  // Enviar las obras sociales al frontend
+        ]);
     }
+    
+
 
     private function generarHorariosDisponibles($fecha)
     {
@@ -265,7 +323,7 @@ class TurnoController extends Controller
         foreach ($bloques as $bloque) {
             $period = CarbonPeriod::create(
                 Carbon::createFromFormat('Y-m-d H:i', "$fecha {$bloque['inicio']}"),
-                '20 minutes',
+                '15 minutes',
                 Carbon::createFromFormat('Y-m-d H:i', "$fecha {$bloque['fin']}")
             );
 

@@ -73,42 +73,46 @@
             <input type="hidden" name="hora" id="hora-input">
 
             @if(Auth::user()->role === 'secretario')
-            <div class="mt-6 flex justify-center">
-    <div class="w-full sm:w-1/2 md:w-1/3">
-        <label for="dni" class="block text-lg font-medium mb-2 text-white">DNI del Paciente:</label>
-        <div class="relative">
-            <!-- Input de DNI -->
-            <input type="text" id="dni" name="dni" class="border p-2 rounded w-full pr-12"
-                placeholder="Buscar por DNI" required pattern="^\d{7,9}$" title="Debe contener entre 7 y 9 números"
-                oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-            
-            <!-- Botón de búsqueda con ícono -->
-            <button type="button" class="absolute inset-y-0 right-0 px-3 flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-r">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M11 17a6 6 0 100-12 6 6 0 000 12zM21 21l-4.35-4.35" />
-                </svg>
-            </button>
-        </div>
-        @error('dni')
-            <span class="text-red-500 text-sm">{{ $message }}</span>
-        @enderror
-        <div id="dni-info" class="mt-2 text-white"></div>
+                <div class="mt-6 flex justify-center">
+                    <div class="w-full sm:w-1/2 md:w-1/3">
+                        <label for="dni" class="block text-lg font-medium mb-2 text-white">DNI del Paciente:</label>
+                        <div class="relative">
+                            <!-- Input de DNI -->
+                            <input type="text" id="dni" name="dni" class="border p-2 rounded w-full pr-12"
+                                placeholder="Buscar por DNI" required pattern="^\d{7,9}$"
+                                title="Debe contener entre 7 y 9 números"
+                                oninput="this.value = this.value.replace(/[^0-9]/g, '');">
 
-        <!-- Spinner de carga para DNI -->
-        <div id="dni-spinner" class="mb-12" style="display: none;">
-            <svg aria-hidden="true" class="w-6 h-6 text-gray-200 animate-spin fill-blue-600 inline"
-                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                    d="M100 50.59c0-27.61-22.39-50-50-50S0 22.98 0 50.59a50.22 50.22 0 0015.22 35.36A49.78 49.78 0 0050 101c27.61 0 50-22.39 50-50.41zM9.08 50.59c0-22.61 18.32-40.92 40.92-40.92s40.92 18.32 40.92 40.92S72.61 91.51 50 91.51 9.08 73.2 9.08 50.59z"
-                    fill="currentColor" />
-                <path
-                    d="M93.97 39.04c1.78-.46 2.89-2.27 2.4-4.05a3.635 3.635 0 00-4.05-2.4c-1.78.46-2.89 2.27-2.4 4.05.46 1.78 2.27 2.89 4.05 2.4z"
-                    fill="currentFill" />
-            </svg>
-            <span class="text-white ml-2">Verificando DNI...</span>
-        </div>
-    </div>
-</div>
+                            <!-- Botón de búsqueda con ícono -->
+                            <button type="button"
+                                class="absolute inset-y-0 right-0 px-3 flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 rounded-r">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                        d="M11 17a6 6 0 100-12 6 6 0 000 12zM21 21l-4.35-4.35" />
+                                </svg>
+                            </button>
+                        </div>
+                        @error('dni')
+                            <span class="text-red-500 text-sm">{{ $message }}</span>
+                        @enderror
+                        <div id="dni-info" class="mt-2 text-white"></div>
+
+                        <!-- Spinner de carga para DNI -->
+                        <div id="dni-spinner" class="mb-12" style="display: none;">
+                            <svg aria-hidden="true" class="w-6 h-6 text-gray-200 animate-spin fill-blue-600 inline"
+                                viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path
+                                    d="M100 50.59c0-27.61-22.39-50-50-50S0 22.98 0 50.59a50.22 50.22 0 0015.22 35.36A49.78 49.78 0 0050 101c27.61 0 50-22.39 50-50.41zM9.08 50.59c0-22.61 18.32-40.92 40.92-40.92s40.92 18.32 40.92 40.92S72.61 91.51 50 91.51 9.08 73.2 9.08 50.59z"
+                                    fill="currentColor" />
+                                <path
+                                    d="M93.97 39.04c1.78-.46 2.89-2.27 2.4-4.05a3.635 3.635 0 00-4.05-2.4c-1.78.46-2.89 2.27-2.4 4.05.46 1.78 2.27 2.89 4.05 2.4z"
+                                    fill="currentFill" />
+                            </svg>
+                            <span class="text-white ml-2">Verificando DNI...</span>
+                        </div>
+                    </div>
+                </div>
 
 
             @endif
@@ -257,54 +261,106 @@
     }
 
     @if(Auth::user()->role === 'secretario')
-        document.getElementById('dni').addEventListener('blur', function () {
-            const dni = this.value.trim();
+    document.getElementById('dni').addEventListener('blur', function () {
+        const dni = this.value.trim();
 
-            // Resto del código para verificar el DNI
-            const dniInfo = document.getElementById('dni-info');
-            const dniSpinner = document.getElementById('dni-spinner');
+        const dniInfo = document.getElementById('dni-info');
+        const dniSpinner = document.getElementById('dni-spinner');
 
-            if (dni === '') {
-                dniInfo.textContent = '';
-                return;
-            }
+        if (dni === '') {
+            dniInfo.textContent = '';
+            return;
+        }
 
-            // Mostrar el spinner de DNI
-            dniSpinner.style.display = 'block';
-            dniInfo.innerHTML = ''; // Limpiar información previa
+        dniSpinner.style.display = 'block';
+        dniInfo.innerHTML = ''; // Limpiar información previa
 
-            fetch('{{ route('verificarDni') }}', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
-                },
-                body: JSON.stringify({ dni: dni })
+        fetch('{{ route('verificarDni') }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            },
+            body: JSON.stringify({ dni: dni })
+        })
+            .then(response => response.json())
+            .then(data => {
+                dniSpinner.style.display = 'none';
+
+                if (data.existe) {
+                    dniInfo.innerHTML = 
+                        `<div style="margin-bottom: 10px;" class="text-green-400">
+                            DNI perteneciente a <strong>${data.nombre}</strong>
+                        </div>`;
+                } else {
+                    Swal.fire({
+                        title: 'Paciente no registrado',
+                        html: `El DNI <strong>${dni}</strong> no está registrado. ¿Desea registrarlo?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Registrar',
+                        cancelButtonText: 'Cancelar',
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            const obrasSocialesOptions = data.obrasSociales.map(obra => `<option value="${obra}"></option>`).join('');
+
+                            Swal.fire({
+                                title: 'Registrar Paciente',
+                                html: `
+                                    <div>
+                                        <p><strong>DNI:</strong> ${dni}</p>
+                                        <input type="text" id="nombre" class="swal2-input" placeholder="Nombre completo">
+                                        <input list="obras-sociales" id="obra-social" class="swal2-input" placeholder="Obra social">
+                                        <datalist id="obras-sociales">
+                                            ${obrasSocialesOptions}
+                                        </datalist>
+                                    </div>
+                                `,
+                                showCancelButton: true,
+                                confirmButtonText: 'Registrar',
+                                cancelButtonText: 'Volver',
+                                preConfirm: () => {
+                                    const nombre = document.getElementById('nombre').value;
+                                    const obraSocial = document.getElementById('obra-social').value;
+
+                                    if (!nombre) {
+                                        Swal.showValidationMessage('Debe ingresar un nombre');
+                                        return false;
+                                    }
+
+                                    // Guardar el paciente en la tabla pacientes_no_logueados
+                                    return fetch('{{ route('registrarPacienteNoLogueado') }}', {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                                        },
+                                        body: JSON.stringify({ nombre: nombre, dni: dni, obra_social: obraSocial })
+                                    })
+                                        .then(response => response.json())
+                                        .then(data => {
+                                            if (data.success) {
+                                                Swal.fire('Registrado', 'El paciente ha sido registrado correctamente.', 'success');
+                                            } else {
+                                                Swal.fire('Error', 'No se pudo registrar al paciente.', 'error');
+                                            }
+                                        });
+                                }
+                            });
+                        }
+                    });
+                }
             })
-                .then(response => response.json())
-                .then(data => {
-                    // Ocultar el spinner de DNI
-                    dniSpinner.style.display = 'none';
+            .catch(error => {
+                console.error('Error al verificar DNI:', error);
+                dniSpinner.style.display = 'none';
+                dniInfo.innerHTML = `<span class="text-red-500">Error al verificar el DNI.</span>`;
+            });
+    });
+@endif
 
-                    if (data.existe) {
-                        dniInfo.innerHTML = `
-                                    <div style="margin-bottom: 10px;" class="text-green-400">DNI perteneciente a <strong>${data.nombre}</strong></div>
-                                    `;
 
-                    } else {
-                        dniInfo.innerHTML = `
-              <div class="text-yellow-400 mb-6">DNI no registrado. Se reservará para DNI: <strong>${dni}</strong></div>
-            `;
 
-                    }
-                })
-                .catch(error => {
-                    console.error('Error al verificar DNI:', error);
-                    dniSpinner.style.display = 'none';
-                    dniInfo.innerHTML = `<span class="text-red-500">Error al verificar el DNI.</span>`;
-                });
-        });
-    @endif
 
 
     function validarReserva(event) {

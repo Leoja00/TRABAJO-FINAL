@@ -7,6 +7,7 @@ use App\Http\Controllers\ProfesionalController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\ObraSocialController;
 use App\Http\Controllers\TurnoController;
+use App\Http\Controllers\PacienteNoLogueadoController;
 
 
 
@@ -94,6 +95,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 
+        Route::post('/registrar-paciente-no-logueado', [PacienteNoLogueadoController::class, 'registrar'])->name('registrarPacienteNoLogueado');
 
 });
 

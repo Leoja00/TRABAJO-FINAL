@@ -57,13 +57,21 @@
                                             <td class="py-2 px-4 block md:table-cell" style="font-weight: 500;" data-label="Paciente"
                                                 data-dni="{{ $turno->paciente->user->dni ?? $turno->dni_paciente_no_registrado }}">
                                                 @if($turno->paciente)
-                                                    {{ $turno->paciente->user->name }} <br>
-                                                    <small>DNI: <span style="font-weight:700">{{ $turno->paciente->user->dni }}</span></small>
-                                                @else
-                                                    {{ $turno->paciente_no_registrado_nombre }} <br>
-                                                    <small>DNI: <span
-                                                            style="font-weight:700">{{ $turno->dni_paciente_no_registrado }}</span></small>
-                                                @endif
+    {{ $turno->paciente->user->name }} <br>
+    <small>DNI: <span style="font-weight:700">{{ $turno->paciente->user->dni }}</span></small>
+    
+    @if($turno->paciente->obra_social === 'PAMI')
+        <br><small>Turnos en el año <strong>PAMI</strong>:  <span style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
+    @endif
+@else
+    {{ $turno->paciente_no_registrado_nombre }} <br>
+    <small>DNI: <span style="font-weight:700">{{ $turno->dni_paciente_no_registrado }}</span></small>
+    
+    @if($turno->turnosEnElAno > 0)
+        <br><small>Turnos en el año: <span style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
+    @endif
+@endif
+
                                             </td>
 
 

@@ -363,47 +363,116 @@
 
 
 
-    function validarReserva(event) {
-        event.preventDefault();
+function validarReserva(event) {
+    event.preventDefault();
 
-        const profesionalId = document.getElementById('profesional_id-hidden').value;
-        const fecha = document.getElementById('fecha-input').value;
-        const hora = document.getElementById('hora-input').value;
+    const profesionalId = document.getElementById('profesional_id-hidden').value;
+    const fecha = document.getElementById('fecha-input').value;
+    const hora = document.getElementById('hora-input').value;
 
-        @if(Auth::user()->role === 'secretario')
-            const dni = document.getElementById('dni').value.trim();
-        @endif
+    @if(Auth::user()->role === 'secretario')
+        const dniElement = document.getElementById('dni');
+        const dni = dniElement ? dniElement.value.trim() : '';
+    @endif
+    let mensaje = '';
 
-        let mensaje = '';
+    if (!profesionalId || !fecha || !hora) {
+        mensaje = 'Por favor, selecciona un profesional, una fecha y una hora.';
+    }
 
-        if (!profesionalId || !fecha || !hora) {
-            mensaje = 'Por favor, asegúrate de seleccionar un profesional, una fecha y una hora antes de reservar.';
+    @if(Auth::user()->role === 'secretario')
+        if (!dni) {
+            mensaje = 'Por favor, ingresa el DNI del paciente.';
         }
+    @endif
 
+    if (mensaje) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: mensaje,
+        });
+        return false;
+    } else {
+        // Aquí separo el flujo para secretarios y pacientes
         @if(Auth::user()->role === 'secretario')
-            if (!dni) {
-                mensaje = 'Por favor, ingresa el DNI del paciente.';
-            }
-        @endif
-
-        if (mensaje) {
+            // Mostrar alerta de carga mientras se realiza la verificación de DNI
             Swal.fire({
-                icon: 'warning',
-                title: 'Atención',
-                text: mensaje,
+                title: 'Cargando...',
+                text: 'Cargando reservación de turno, por favor espera.',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                }
             });
-            return false;
-        } else {
-            // Preparar información para la confirmación
-            let confirmHtml = `<strong>Profesional:</strong> ${document.querySelector("#profesional_id option:checked").textContent}<br>
-                              <strong>Fecha:</strong> ${fecha}<br>
-                              <strong>Hora:</strong> ${hora}<br>`;
 
-            @if(Auth::user()->role === 'secretario')
-                const dni = document.getElementById('dni').value.trim();
-                const dniInfoText = document.getElementById('dni-info').textContent;
-                confirmHtml += `<strong>DNI:</strong> ${dni}<br>${dniInfoText}`;
-            @endif
+            // Verificar el DNI vía fetch
+            fetch('{{ route("verificarDni") }}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({ dni })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let confirmHtml = `<strong>Profesional:</strong> ${document.querySelector("#profesional_id option:checked").textContent}<br>
+                                   <strong>Fecha:</strong> ${fecha}<br>
+                                   <strong>Hora:</strong> ${hora}<br>`;
+
+                if (data.existe) {
+                    confirmHtml += `<strong>Nombre del paciente:</strong> ${data.nombre}<br>`;
+                    if (data.obraSocial === 'PAMI') {
+                        confirmHtml += `<strong>Obra Social:</strong> ${data.obraSocial}<br>`;
+                        confirmHtml += `<strong>Turnos en el año:</strong> ${data.turnosEnElAno} de 12. Al reservar, será el turno ${data.turnosEnElAno + 1} <br>`;
+                    }
+                } else {
+                    confirmHtml += `<strong>DNI no registrado</strong>`;
+                }
+
+                Swal.fire({
+                    title: '¿Estás seguro de que deseas reservar este turno?',
+                    html: confirmHtml,
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, reservar',
+                    cancelButtonText: 'Cancelar'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Turno reservado correctamente',
+                            text: 'Tu turno ha sido reservado con éxito.',
+                        }).then(() => {
+                            event.target.submit(); // Enviar el formulario
+                        });
+                    } else {
+                        Swal.close();
+                    }
+                });
+            })
+            .catch(error => {
+                Swal.close();
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al verificar el DNI. Inténtalo de nuevo.',
+                });
+            });
+        @else
+            // Para los pacientes: confirmar el turno directamente sin verificación
+            // Suponemos que el paciente ya tiene su obra social y turnos en el año
+            const obraSocial = '{{ Auth::user()->paciente->obra_social }}'; // Cambia según tu lógica
+            const turnosEnElAno = {{ Auth::user()->paciente->turnos()->whereYear('dia_hora', now()->year)->count() }}; // Cambia según tu lógica
+            let confirmHtml = `<strong>Profesional:</strong> ${document.querySelector("#profesional_id option:checked").textContent}<br>
+                               <strong>Fecha:</strong> ${fecha}<br>
+                               <strong>Hora:</strong> ${hora}<br>`;
+
+            if (obraSocial === 'PAMI') {
+                confirmHtml += `<strong>Obra Social:</strong> ${obraSocial}<br>`;
+                confirmHtml += `<strong>Turnos en el año:</strong> ${turnosEnElAno} de 12. Al reservar, será el turno ${turnosEnElAno + 1} <br>`;
+            }
 
             Swal.fire({
                 title: '¿Estás seguro de que deseas reservar este turno?',
@@ -414,19 +483,24 @@
                 cancelButtonText: 'Cancelar'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Mostrar mensaje de éxito antes de enviar
                     Swal.fire({
                         icon: 'success',
                         title: 'Turno reservado correctamente',
                         text: 'Tu turno ha sido reservado con éxito.',
                     }).then(() => {
-                        // Enviar el formulario
-                        event.target.submit();
+                        event.target.submit(); // Enviar el formulario
                     });
+                } else {
+                    Swal.close();
                 }
             });
-        }
+        @endif
     }
+}
+
+
+
+
 
     document.addEventListener('DOMContentLoaded', function () {
         const fechaInput = document.getElementById('fecha');

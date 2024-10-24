@@ -36,4 +36,7 @@ public function secretario()
 public function user() {
     return $this->belongsTo(User::class);
 }
+public function historialClinico() {
+    return $this->belongsTo(HistorialClinico::class);
+}
 }

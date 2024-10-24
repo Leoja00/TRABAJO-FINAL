@@ -42,11 +42,16 @@
                     </tr>
                 </thead>
                 <tbody id="turnosTableBody">
+                    @php
+                        $orden = 1; // Inicializar contador de orden
+                    @endphp
                     @forelse($turnos as $turno)
                                         <tr class="border-b block md:table-row" data-fecha="{{ $turno->dia_hora }}"
                                             data-estado="{{ $turno->estado }}"
                                             data-dni="{{ $turno->paciente ? $turno->paciente->user->dni : $turno->dni_paciente_no_registrado }}">
-                                            <td class="py-2 px-4 block md:table-cell" data-label="ID"><strong>{{ $turno->id }}</strong></td>
+                                            <td class="py-2 px-4 block md:table-cell" data-label="Orden">
+                                                <strong>{{ $orden++ }}</strong> <!-- Mostrar y luego incrementar el contador -->
+                                            </td>
                                             <td class="py-2 px-4 block md:table-cell" style="font-weight: 500;" data-label="Paciente">
                                                 @if($turno->paciente)
                                                     {{ $turno->paciente->user->name ?? 'Paciente no disponible' }} <br>
@@ -83,6 +88,16 @@
                                                     <span class="text-green-600" style="font-weight: 700;">Completado</span>
                                                 @elseif($turno->estado === 'reservado')
                                                     <span class="text-yellow-600" style="font-weight: 600;">Reservado</span>
+                                                    <form id="cancelar-secretario-form-{{ $turno->id }}"
+                                                        action="{{ route('turno.cancelarSecretario', $turno->id) }}" method="POST"
+                                                        style="display:inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="bg-rose-500 text-white py-1 px-3 rounded hover:bg-rose-700"
+                                                            onclick="confirmarCancelacionSecretario({{ $turno->id }})">Cancelar turno</button>
+
+                                                    </form>
+
                                                 @else
                                                     <span class="text-gray-600" style="font-weight: 600;">{{ ucfirst($turno->estado) }}</span>
                                                 @endif
@@ -137,6 +152,31 @@
 </style>
 
 <script>
+    function confirmarCancelacionSecretario(turnoId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "No podrás revertir esta acción.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, cancelar turno',
+            cancelButtonText: 'No, volver'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Turno cancelado correctamente',
+                    text: 'El turno ha sido cancelado con éxito.',
+                }).then(() => {
+                    document.getElementById('cancelar-secretario-form-' + turnoId).submit();
+                });
+            } else {
+                Swal.close();
+            }
+        });
+    }
+
     document.addEventListener('DOMContentLoaded', function () {
         const dniSearch = document.getElementById('dniSearch');
         const clearSearch = document.getElementById('clearSearch');

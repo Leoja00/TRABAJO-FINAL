@@ -42,11 +42,16 @@
                     </tr>
                 </thead>
                 <tbody id="turnosTableBody">
+                    @php
+                        $orden = 1; // Inicializar contador de orden
+                    @endphp
                     @forelse($turnos as $turno)
                                         <tr class="border-b block md:table-row" data-fecha="{{ $turno->dia_hora }}"
                                             data-estado="{{ $turno->estado }}"
                                             data-dni="{{ $turno->paciente->dni ?? $turno->dni_paciente_no_registrado }}">
-                                            <td class="py-2 px-4 block md:table-cell" data-label="ID"><strong>{{ $turno->id }}</strong></td>
+                                            <td class="py-2 px-4 block md:table-cell" data-label="Orden">
+                                                <strong>{{ $orden++ }}</strong> <!-- Mostrar y luego incrementar el contador -->
+                                            </td>
                                             <td class="py-2 px-4 block md:table-cell" data-label="Fecha y Hora">
                                                 @php
                                                     $fechaHora = \Carbon\Carbon::parse($turno->dia_hora);
@@ -57,31 +62,51 @@
                                             <td class="py-2 px-4 block md:table-cell" style="font-weight: 500;" data-label="Paciente"
                                                 data-dni="{{ $turno->paciente->user->dni ?? $turno->dni_paciente_no_registrado }}">
                                                 @if($turno->paciente)
-    {{ $turno->paciente->user->name }} <br>
-    <small>DNI: <span style="font-weight:700">{{ $turno->paciente->user->dni }}</span></small>
-    
-    @if($turno->paciente->obra_social === 'PAMI')
-        <br><small>Turnos en el año <strong>PAMI</strong>:  <span style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
-    @endif
-@else
-    {{ $turno->paciente_no_registrado_nombre }} <br>
-    <small>DNI: <span style="font-weight:700">{{ $turno->dni_paciente_no_registrado }}</span></small>
-    
-    @if($turno->turnosEnElAno > 0)
-        <br><small>Turnos en el año: <span style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
-    @endif
-@endif
+                                                    {{ $turno->paciente->user->name }} <br>
+                                                    <small>DNI: <span style="font-weight:700">{{ $turno->paciente->user->dni }}</span></small>
+
+                                                    @if($turno->paciente->obra_social === 'PAMI')
+                                                        <br><small>Turnos en el año <strong>PAMI</strong>: <span
+                                                                style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
+                                                    @endif
+                                                @else
+                                                    {{ $turno->paciente_no_registrado_nombre }} <br>
+                                                    <small>DNI: <span
+                                                            style="font-weight:700">{{ $turno->dni_paciente_no_registrado }}</span></small>
+
+                                                    @if($turno->turnosEnElAno > 0)
+                                                        <br><small>Turnos en el año: <span
+                                                                style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
+                                                    @endif
+                                                @endif
 
                                             </td>
 
 
                                             <td class="py-2 px-4 block md:table-cell" data-label="Estado">
                                                 @if($turno->estado === 'completado')
-                                                    <span class="text-green-600" style="00;">Completado</span>
+                                                    <span class="text-green-600" style="font-weight: 600;">Completado</span>
+                                                    <!-- @if($turno->paciente)
+                                                                                 Enlace para paciente logueado
+                                                                                <a href="{{ route('historial.crear', ['paciente_id' => $turno->paciente->id, 'profesional_id' => Auth::user()->id]) }}"
+                                                                                    class="text-blue-500 hover:text-blue-700">
+                                                                                    Cargar/Completar Historia Clínica
+                                                                                </a>
+                                                                            @elseif($turno->dni_paciente_no_registrado)
+                                                                                Enlace para paciente no logueado 
+                                                                                <a href="{{ route('historial.crear', ['paciente_id' => $turno->dni_paciente_no_registrado, 'profesional_id' => Auth::user()->id]) }}"
+                                                                                    class="text-blue-500 hover:text-blue-700">
+                                                                                    Cargar/Completar Historia Clínica (No logueado)
+                                                                                </a>
+                                                                            @endif-->
                                                 @elseif($turno->estado === 'reservado')
                                                     <span class="text-yellow-600" style="font-weight: 600;">Reservado</span>
                                                 @endif
                                             </td>
+
+
+
+
                                         </tr>
                     @empty
                         <tr>

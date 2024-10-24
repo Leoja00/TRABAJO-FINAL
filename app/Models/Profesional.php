@@ -27,4 +27,9 @@ class Profesional extends Model
     {
         return $this->hasMany(Turno::class);
     }
+    public function profesional()
+{
+    return $this->hasOne(Profesional::class);
+}
+
 }

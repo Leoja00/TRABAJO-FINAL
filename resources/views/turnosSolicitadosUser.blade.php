@@ -15,7 +15,8 @@
             <div class="flex justify-center">
                 <div class="inline-block mx-auto my-4 bg-white bg-opacity-80 rounded-lg shadow-lg p-4">
                     <p class="text-lg text-sky-950	">Turnos reservados con la obra social de <strong>PAMI</strong> en el año
-                        <strong>{{ $turnosEnElAno }}</strong></p>
+                        <strong>{{ $turnosEnElAno }}</strong>
+                    </p>
 
 
                 </div>
@@ -42,10 +43,15 @@
                     </tr>
                 </thead>
                 <tbody id="turnosTableBody">
+                    @php
+                        $orden = 1; // Inicializar contador de orden
+                    @endphp
                     @forelse($turnos as $turno)
                                         <tr class="border-b block md:table-row" data-fecha="{{ $turno->dia_hora }}"
                                             data-estado="{{ $turno->estado }}">
-                                            <td class="py-2 px-4 block md:table-cell" data-label="ID"><strong>{{ $turno->id }}</strong></td>
+                                            <td class="py-2 px-4 block md:table-cell" data-label="Orden">
+                                                <strong>{{ $orden++ }}</strong> <!-- Mostrar y luego incrementar el contador -->
+                                            </td>
                                             <td class="py-2 px-4 block md:table-cell" data-label="Fecha y Hora">
                                                 @php
                                                     $fechaHora = \Carbon\Carbon::parse($turno->dia_hora);
@@ -64,7 +70,15 @@
                                                     <span class="text-green-600" style="font-weight: 700;">Completado</span>
                                                 @elseif($turno->estado === 'reservado')
                                                     <span class="text-yellow-600" style="font-weight: 600;">Reservado</span>
+                                                    <form id="cancelar-form-{{ $turno->id }}" action="{{ route('turno.cancelar', $turno->id) }}"
+                                                        method="POST" style="display:inline;">
+                                                        @csrf
+                                                        @method('DELETE')
+                                                        <button type="button" class="bg-rose-500 text-white py-1 px-3 rounded hover:bg-rose-700"
+                                                            onclick="confirmarCancelacion({{ $turno->id }})">Cancelar</button>
+                                                    </form>
                                                 @endif
+
                                             </td>
                                         </tr>
                     @empty
@@ -121,6 +135,34 @@
 </style>
 
 <script>
+
+    function confirmarCancelacion(turnoId) {
+        Swal.fire({
+            title: '¿Estás seguro?',
+            text: "No podrás revertir esta acción.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, cancelar turno',
+            cancelButtonText: 'No, volver'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Turno cancelado correctamente',
+                    text: 'El turno ha sido cancelado con éxito.',
+                }).then(() => {
+
+                    document.getElementById('cancelar-form-' + turnoId).submit();
+                });
+            } else {
+                Swal.close();
+            }
+        });
+    }
+
+
     document.addEventListener('DOMContentLoaded', function () {
         const turnosTableBody = document.getElementById('turnosTableBody');
         const fechaHoraHeader = document.getElementById('fechaHoraHeader');

@@ -70,6 +70,68 @@ class TurnoController extends Controller
     return view('pacientesAdheridosProfesional', compact('turnos'));
 }
 
+public function verPacientesHistorial()
+{
+    // Verificamos que el usuario esté autenticado y sea un profesional
+    if (!Auth::check() || Auth::user()->role !== 'profesional') {
+        return redirect()->route('home');
+    }
+
+    $isMobile = request()->header('User-Agent') && preg_match('/Mobile|Android|iPhone/', request()->header('User-Agent'));
+    $perPage = $isMobile ? 3 : 50;
+
+    $user = Auth::user();
+    $turnos = $user->profesional->turnos()->with('paciente.user')->get();
+
+    // Usamos un conjunto para almacenar pacientes únicos
+    $pacientes = [];
+
+    foreach ($turnos as $turno) {
+        if ($turno->paciente) {
+            // Para pacientes logueados, utilizamos el ID
+            $paciente = $turno->paciente;
+            $historiales = $paciente->historialClinicos; // Asegúrate de tener la relación definida
+
+            $pacientes[$paciente->id] = (object) [
+                'id' => $paciente->id,
+                'name' => $paciente->user->name,
+                'dni' => $paciente->user->dni,
+                'obra_social' => $paciente->obra_social,
+                'historiales' => $historiales,
+            ];
+        } elseif ($turno->dni_paciente_no_registrado) {
+            $pacienteNoRegistrado = DB::table('pacientes_no_logueados')
+                ->where('dni', $turno->dni_paciente_no_registrado)
+                ->first();
+    
+            if ($pacienteNoRegistrado) {
+                // Para pacientes no logueados, utilizamos el DNI como identificador
+                $pacientes[$pacienteNoRegistrado->dni] = (object) [
+                    'id' => $pacienteNoRegistrado->dni, 
+                    'name' => $pacienteNoRegistrado->name,
+                    'dni' => $pacienteNoRegistrado->dni,
+                    'obra_social' => $pacienteNoRegistrado->obra_social,
+                    'historiales' => [], // No hay historiales para pacientes no registrados
+                ];
+            }
+        }
+    }
+    
+    $pacientes = collect($pacientes)->values();
+    $pacientesPaginated = new \Illuminate\Pagination\LengthAwarePaginator(
+        $pacientes->forPage(request()->input('page', 1), $perPage),
+        $pacientes->count(),
+        $perPage,
+        request()->input('page', 1),
+        ['path' => request()->url(), 'query' => request()->query()]
+    );
+
+    return view('pacientesHistorial', compact('pacientesPaginated'));
+}
+
+
+
+
 
 
 
@@ -133,6 +195,34 @@ public function verTurnos()
 
     return view('turnosSolicitadosUser', compact('turnos', 'turnosEnElAno'));
 }
+public function cancelarTurno($id)
+{
+    $turno = Turno::find($id);
+
+    if (!$turno || $turno->estado !== 'reservado') {
+        return redirect()->back()->with('error', 'El turno no se puede cancelar.');
+    }
+
+    // Eliminar el turno
+    $turno->delete();
+
+    return redirect()->route('turnos.ver')->with('success', 'Turno cancelado con éxito.');
+}
+public function cancelarTurnoSecretario($id)
+{
+    $turno = Turno::find($id);
+
+    if (!$turno || $turno->estado !== 'reservado') {
+        return redirect()->back()->with('error', 'El turno no se puede cancelar.');
+    }
+
+    // Eliminar el turno
+    $turno->delete();
+
+    return redirect()->route('turnos.secretario')->with('success', 'Turno cancelado con éxito.');
+}
+
+
 
 
     public function reservarTurno(Request $request)
@@ -231,7 +321,7 @@ public function verTurnos()
                 'estado' => 'reservado',
             ]);
 
-            return redirect()->route('home')->with('success', 'Turno reservado con éxito para ' . $usuario->name . ' por el secretario.');
+            return redirect()->route('turnos.secretario')->with('success', 'Turno reservado con éxito para ' . $usuario->name . ' por el secretario.');
         }
 
         // Guardar turno para un DNI no registrado
@@ -249,7 +339,7 @@ public function verTurnos()
         ]);
 
 
-        return redirect()->route('home')->with('success', 'Turno reservado con éxito para DNI: ' . $dni . ' por el secretario.');
+        return redirect()->route('turnos.secretario')->with('success', 'Turno reservado con éxito para DNI: ' . $dni . ' por el secretario.');
     }
 
     /**
@@ -272,7 +362,7 @@ public function verTurnos()
             'estado' => 'reservado',
         ]);
 
-        return redirect()->route('home')->with('success', 'Turno reservado con éxito.');
+        return redirect()->route('turnos.ver')->with('success', 'Turno reservado con éxito.');
     }
 
 

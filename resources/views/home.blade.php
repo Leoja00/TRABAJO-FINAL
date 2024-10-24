@@ -10,9 +10,9 @@
             <h1 class="text-3xl font-bold mb-4">Consultorio Dra. Adriana Mencarelli</h1>
             <p class="text-lg">Tu bienestar es nuestra prioridad. En nuestro consultorio, estamos comprometidos a
                 brindarte atención médica de calidad y personalizada.</p>
-            <a href="#conocenos"
+            <!--<a href="#conocenos"
                 class="text-white bg-gradient-to-r from-teal-400 via-teal-500 to-teal-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-teal-300 dark:focus:ring-teal-800 shadow-lg shadow-teal-500/50 dark:shadow-lg dark:shadow-teal-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mt-4 transition duration-300 inline-block">Más
-                de nosotros</a>
+                de nosotros</a>-->
         </div>
     </div>
 </div>

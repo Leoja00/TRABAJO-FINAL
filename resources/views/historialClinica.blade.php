@@ -14,19 +14,21 @@
             <ul class="space-y-2">
                 @foreach ($historiales as $historial)
                     <a href="#" class="block p-2 bg-cyan-600 text-white rounded hover:bg-cyan-800" onclick="mostrarHistorial({
-                                       id: {{ $historial->id }},
+                                               id: {{ $historial->id }},
 
-                                       tension_arterial: '{{ $historial->tension_arterial }}',
-                                       peso: '{{ $historial->peso }}',
-                                       motivo_consulta: '{{ $historial->motivo_consulta }}',
-                                       datos_relevantes_examen_fisico: '{{ $historial->datos_relevantes_examen_fisico }}',
-                                       diagnostico: '{{ $historial->diagnostico }}',
-                                       tratamiento_indicaciones: '{{ $historial->tratamiento_indicaciones }}',
-                                       documentacion: '{{ $historial->documentacion }}',
-                                       created_at: '{{ $historial->created_at->format('d/m/Y') }}'
-                                   })">Historial del {{ $historial->created_at->format('d/m/Y') }}</a>
+                                               tension_arterial: '{{ $historial->tension_arterial }}',
+                                               peso: '{{ $historial->peso }}',
+                                               motivo_consulta: '{{ $historial->motivo_consulta }}',
+                                               datos_relevantes_examen_fisico: '{{ $historial->datos_relevantes_examen_fisico }}',
+                                               diagnostico: '{{ $historial->diagnostico }}',
+                                               tratamiento_indicaciones: '{{ $historial->tratamiento_indicaciones }}',
+                                               documentacion: '{{ $historial->documentacion }}',
+                                               created_at: '{{ $historial->created_at->format('d/m/Y H:i') }}'
+                                           })">Historial del {{ $historial->created_at->format('d/m/Y H:i') }}</a>
+                                           
 
                 @endforeach
+                
             </ul>
             <button class="mt-4 w-full bg-green-600 text-white py-2 rounded hover:bg-green-800"
                 onclick="crearNuevoHistorial()">Crear Nuevo Historial</button>
@@ -153,20 +155,12 @@
                         <div id="documentacion" class="form-section hidden bg-white p-8 rounded-lg shadow-md">
                             <h3 class="text-xl font-bold mb-4">Documentación</h3>
 
-                            <!-- Mostrar documentos existentes -->
-                            <div id="documentosExistentes" class="mb-4">
-                                <h4 class="font-semibold text-gray-700">Documentos Existentes:</h4>
+                            <!-- Mostrar documentos solo para el historial seleccionado -->
+                            <div id="documentosSeleccionados" class="mb-4">
+                                <h4 class="font-semibold text-gray-700">Documentos del historial seleccionado:</h4>
                                 <ul id="listaDocumentos" class="list-disc pl-5">
-                                    @if(isset($historial->documentacion))
-                                        @foreach(json_decode($historial->documentacion, true) as $doc)
-                                            <li>
-                                                <a href="/consultorio/public/{{ $doc }}" target="_blank"
-                                                    class="text-blue-600 hover:underline">{{ basename($doc) }}</a>
-                                            </li>
-                                        @endforeach
-                                    @else
-                                        <li class="text-gray-500">No hay documentos adjuntos.</li>
-                                    @endif
+                                    <!-- Aquí se cargarán dinámicamente los documentos del historial -->
+                                    <li class="text-gray-500">Seleccione un historial para ver sus documentos.</li>
                                 </ul>
                             </div>
 
@@ -177,6 +171,8 @@
                                 class="form-input mt-1 block w-full border border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
                                 multiple>
                         </div>
+
+
                     </div>
 
                     <!-- Botón para guardar -->
@@ -194,7 +190,7 @@
 <script>
     function mostrarHistorial(historial) {
         const historialId = historial.id;
-        console.log("Historial ID:", historialId); // Mostrar el ID en la consola para verificar
+        console.log("Historial ID:", historialId); 
 
         document.getElementById('historialIdDisplay').value = historialId;
 
@@ -207,8 +203,6 @@
 
         const form = document.getElementById('historiaClinicaForm');
         form.action = "{{ url('/historial') }}/" + historialId + "/actualizar";
-
-
         form.method = 'POST';
 
         let methodInput = document.querySelector('input[name="_method"]');
@@ -230,7 +224,41 @@
         }
 
         document.getElementById('formNuevoHistorial').classList.remove('hidden');
+
+        // Limpiar la lista de documentos previos
+        const listaDocumentos = document.getElementById('listaDocumentos');
+        listaDocumentos.innerHTML = '';
+
+        // Verificar si el historial tiene documentación y decodificarla si es necesario
+        let documentos = historial.documentacion;
+
+        if (typeof documentos === 'string') {
+            try {
+                documentos = JSON.parse(documentos);
+            } catch (error) {
+                console.error("Error al decodificar la documentación:", error);
+            }
+        }
+
+        if (Array.isArray(documentos) && documentos.length > 0) {
+            documentos.forEach(function (doc) {
+                const li = document.createElement('li');
+                const a = document.createElement('a');
+                a.href = "/consultorio/public/" + doc;
+                a.target = "_blank";
+                a.classList.add('text-blue-600', 'hover:underline');
+                a.textContent = doc.split('/').pop(); 
+                li.appendChild(a);
+                listaDocumentos.appendChild(li);
+            });
+        } else {
+            const noDocsMessage = document.createElement('li');
+            noDocsMessage.textContent = 'No hay documentos adjuntos en este historial.';
+            noDocsMessage.classList.add('text-gray-500');
+            listaDocumentos.appendChild(noDocsMessage);
+        }
     }
+
 
 
     function mostrarSeccion(id) {

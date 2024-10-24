@@ -12,27 +12,27 @@ use Illuminate\Support\Facades\File;
 use Barryvdh\DomPDF\Facade\Pdf;
 class HistorialClinicoController extends Controller
 {
+    public function destroy($id)
+{
+    $historial = HistorialClinico::findOrFail($id);
+    $historial->delete();
+    return redirect()->back()->with('success', 'Historial clínico eliminado correctamente.');
+}
+
     public function crear($paciente_id)
 {
-    // Obtener el profesional autenticado
     $profesionalAutenticado = Auth::user()->profesional;
 
-    // Verificar que el profesional esté asociado
     if (!$profesionalAutenticado) {
         // Abortamos con un error 403 (Prohibido) si no hay profesional asociado
         abort(403, 'Acceso denegado: No se encontró el profesional asociado.');
     }
-
-    // Buscar paciente registrado o no registrado
     $paciente = Paciente::find($paciente_id);
     $pacienteNoLogueado = DB::table('pacientes_no_logueados')->where('dni', $paciente_id)->first();
 
-    // Si no hay ningún paciente, abortar con error 404
     if (!$paciente && !$pacienteNoLogueado) {
         abort(404);
     }
-
-    // Obtener los historiales clínicos según el paciente y el profesional autenticado
     $historiales = HistorialClinico::where(function($query) use ($paciente, $pacienteNoLogueado) {
                                             if ($paciente) {
                                                 $query->where('paciente_id', $paciente->id);
@@ -40,20 +40,18 @@ class HistorialClinicoController extends Controller
                                                 $query->where('paciente_no_logueado_id', $pacienteNoLogueado->id);
                                             }
                                         })
-                                        ->where('profesional_id', $profesionalAutenticado->id) // Limitar por el profesional autenticado
+                                        ->where('profesional_id', $profesionalAutenticado->id) 
                                         ->get(['id', 'tension_arterial', 'peso', 'motivo_consulta', 'datos_relevantes_examen_fisico', 'diagnostico', 'tratamiento_indicaciones', 'documentacion', 'created_at']);
 
-    // Obtener los turnos del paciente según el profesional autenticado
     $turnos = collect();
     if ($paciente) {
         $turnos = $paciente->turnos()->where('profesional_id', $profesionalAutenticado->id)
                                       ->with(['paciente'])
-                                      ->get(); // Limitar turnos por profesional autenticado
+                                      ->get(); 
     } elseif ($pacienteNoLogueado) {
         $turnos = DB::table('turnos')->where('dni_paciente_no_registrado', $pacienteNoLogueado->dni)
-                                     ->where('profesional_id', $profesionalAutenticado->id) // Limitar por el profesional autenticado
+                                     ->where('profesional_id', $profesionalAutenticado->id) 
                                      ->get();
-        // Agregar nombre del paciente no registrado en los turnos
         foreach ($turnos as $turno) {
             $turno->paciente_no_registrado_nombre = $pacienteNoLogueado->name;
         }
@@ -209,24 +207,17 @@ public function guardar(Request $request)
         'documento.*' => 'nullable|file|mimes:pdf,jpeg,png,jpg', 
     ]);
 
-    // Obtener el ID del profesional autenticado
-    $profesionalAutenticado = Auth::user()->profesional; // Asegúrate de que 'profesional' esté definido en el modelo User
-
-    // Verificar que el profesional esté asociado y obtener su ID
+    
+    $profesionalAutenticado = Auth::user()->profesional; 
     if (!$profesionalAutenticado) {
         return redirect()->back()->with('error', 'No se encontró el profesional asociado.');
     }
-
-    // Asignar el ID del profesional desde la tabla 'profesionales'
-    $validatedData['profesional_id'] = $profesionalAutenticado->id; // ID del profesional autenticado
-
+    $validatedData['profesional_id'] = $profesionalAutenticado->id; 
     // Crear la carpeta para documentos si no existe
     $rutaCarpeta = public_path('img/historial_documentos');
     if (!file_exists($rutaCarpeta)) {
         mkdir($rutaCarpeta, 0755, true);
     }
-
-    // Manejo de archivos de documentación
     $rutasDocumentos = [];
     if ($request->hasFile('documento')) {
         foreach ($request->file('documento') as $documento) {

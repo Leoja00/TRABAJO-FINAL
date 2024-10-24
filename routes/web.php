@@ -89,27 +89,27 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/turnos/horarios-disponibles', [TurnoController::class, 'getHorariosDisponibles'])->name('getHorariosDisponibles');
         Route::post('/verificar-dni', [TurnoController::class, 'verificarDni'])->name('verificarDni');
         Route::get('/turnos/ver', [TurnoController::class, 'verTurnos'])->name('turnos.ver');
-        
+
         //ES PARA CANCELAR TURNO DESDE SECRETARIO
 
         Route::get('/turnos/solicited', [TurnoController::class, 'verTurnosSecretarios'])->name('turnos.secretario');
-        });
-        Route::get('/pacientes/adherid', [TurnoController::class, 'verPacientesProfesional'])->name('pacientes.profesional');
-        //aaaaaa
-        Route::get('/pacientes/historial', [TurnoController::class, 'verPacientesHistorial'])->name('pacientesHistorial.profesional');
+    });
+    Route::get('/pacientes/adherid', [TurnoController::class, 'verPacientesProfesional'])->name('pacientes.profesional');
+    //aaaaaa
+    Route::get('/pacientes/historial', [TurnoController::class, 'verPacientesHistorial'])->name('pacientesHistorial.profesional');
 
-        Route::delete('/turnos/{id}/cancelar', [TurnoController::class, 'cancelarTurno'])->name('turno.cancelar');
-Route::delete('/turnos/{id}/cancelar/secretario', [TurnoController::class, 'cancelarTurnoSecretario'])->name('turno.cancelarSecretario');
+    Route::delete('/turnos/{id}/cancelar', [TurnoController::class, 'cancelarTurno'])->name('turno.cancelar');
+    Route::delete('/turnos/{id}/cancelar/secretario', [TurnoController::class, 'cancelarTurnoSecretario'])->name('turno.cancelarSecretario');
 
-//HISTORIAL
-Route::get('/historial/{paciente_id}/crear/{profesional_id}', [HistorialClinicoController::class, 'crear'])->name('historial.crear');
-Route::post('/historial/guardar', [HistorialClinicoController::class, 'guardar'])->name('historial.guardar');
-Route::put('/historial/{id}/actualizar', [HistorialClinicoController::class, 'actualizar'])->name('historial.actualizar');
-Route::get('/paciente/{id}/historiales/descargar', [HistorialClinicoController::class, 'descargarTodosHistorialesPDF'])->name('paciente.historiales.descargar');
+    //HISTORIAL
+    Route::get('/historial/{paciente_id}/crear/{profesional_id}', [HistorialClinicoController::class, 'crear'])->name('historial.crear');
+    Route::post('/historial/guardar', [HistorialClinicoController::class, 'guardar'])->name('historial.guardar');
+    Route::put('/historial/{id}/actualizar', [HistorialClinicoController::class, 'actualizar'])->name('historial.actualizar');
+    Route::get('/paciente/{id}/historiales/descargar', [HistorialClinicoController::class, 'descargarTodosHistorialesPDF'])->name('paciente.historiales.descargar');
 
 
 
-        Route::post('/registrar-paciente-no-logueado', [PacienteNoLogueadoController::class, 'registrar'])->name('registrarPacienteNoLogueado');
+    Route::post('/registrar-paciente-no-logueado', [PacienteNoLogueadoController::class, 'registrar'])->name('registrarPacienteNoLogueado');
 
 });
 

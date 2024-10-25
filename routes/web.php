@@ -106,6 +106,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/historial/guardar', [HistorialClinicoController::class, 'guardar'])->name('historial.guardar');
     Route::put('/historial/{id}/actualizar', [HistorialClinicoController::class, 'actualizar'])->name('historial.actualizar');
     Route::get('/paciente/{id}/historiales/descargar', [HistorialClinicoController::class, 'descargarTodosHistorialesPDF'])->name('paciente.historiales.descargar');
+    Route::post('/paciente-no-logueado/completar', [PacienteNoLogueadoController::class, 'completarCampos'])->name('pacienteNoLogueado.completar');
 
 
 

@@ -384,56 +384,58 @@ public function cancelarTurnoSecretario($id)
     }
 
     public function verificarDni(Request $request)
-    {
-        $request->validate([
-            'dni' => 'required|string',
-        ]);
+{
+    $request->validate([
+        'dni' => 'required|string',
+    ]);
 
-        $dni = $request->input('dni');
+    $dni = $request->input('dni');
+    $usuario = User::where('dni', $dni)->first();
+    $turnosEnElAno = 0;
 
+    // Obtener todas las obras sociales desde la tabla 'obras_sociales'
+    $obrasSociales = DB::table('obras_sociales')
+        ->select('nombre')  // Suponiendo que el campo se llama 'nombre'
+        ->pluck('nombre');  // Obtener solo los nombres de las obras sociales
 
-        $usuario = User::where('dni', $dni)->first();
-        $turnosEnElAno = 0;
-
-        if ($usuario) {
-
-            $paciente = Paciente::where('user_id', $usuario->id)->first();
-            if ($paciente && $paciente->obra_social === 'PAMI') {
-
-                $turnosEnElAno = $paciente->turnos()->whereYear('dia_hora', now()->year)->count();
-            }
-
-            return response()->json([
-                'existe' => true,
-                'nombre' => $usuario->name,
-                'obraSocial' => $paciente->obra_social ?? null,
-                'turnosEnElAno' => $turnosEnElAno,
-            ]);
+    if ($usuario) {
+        $paciente = Paciente::where('user_id', $usuario->id)->first();
+        if ($paciente && $paciente->obra_social === 'PAMI') {
+            $turnosEnElAno = $paciente->turnos()->whereYear('dia_hora', now()->year)->count();
         }
 
-        // Verificar si el DNI está en la tabla de pacientes_no_logueados
-        $pacienteNoLogueado = DB::table('pacientes_no_logueados')->where('dni', $dni)->first();
-        if ($pacienteNoLogueado) {
-            // Verificar si el paciente no registrado tiene PAMI
-            if ($pacienteNoLogueado->obra_social === 'PAMI') {
-                // Contar los turnos de pacientes no logueados
-                $turnosEnElAno = $this->contarTurnosAnualesNoRegistrados($dni);
-            }
-
-            return response()->json([
-                'existe' => true,
-                'nombre' => $pacienteNoLogueado->name,
-                'obraSocial' => $pacienteNoLogueado->obra_social,
-                'turnosEnElAno' => $turnosEnElAno,
-            ]);
-        }
-
-        // Si no se encuentra en ninguna tabla
         return response()->json([
-            'existe' => false,
-            'registrar' => true,
+            'existe' => true,
+            'nombre' => $usuario->name,
+            'obraSocial' => $paciente->obra_social ?? null,
+            'turnosEnElAno' => $turnosEnElAno,
+            'obrasSociales' => $obrasSociales,  // Enviar las obras sociales al frontend
         ]);
     }
+
+    // Verificar si el DNI está en la tabla de pacientes_no_logueados
+    $pacienteNoLogueado = DB::table('pacientes_no_logueados')->where('dni', $dni)->first();
+    if ($pacienteNoLogueado) {
+        if ($pacienteNoLogueado->obra_social === 'PAMI') {
+            $turnosEnElAno = $this->contarTurnosAnualesNoRegistrados($dni);
+        }
+
+        return response()->json([
+            'existe' => true,
+            'nombre' => $pacienteNoLogueado->name,
+            'obraSocial' => $pacienteNoLogueado->obra_social,
+            'turnosEnElAno' => $turnosEnElAno,
+            'obrasSociales' => $obrasSociales,  // Enviar las obras sociales al frontend
+        ]);
+    }
+
+    return response()->json([
+        'existe' => false,
+        'registrar' => true,
+        'obrasSociales' => $obrasSociales,  // Enviar las obras sociales al frontend
+    ]);
+}
+
 
     // Función para contar los turnos de un paciente registrado en el año
     private function contarTurnosAnuales($userId)

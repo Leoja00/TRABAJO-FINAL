@@ -285,6 +285,8 @@
         })
             .then(response => response.json())
             .then(data => {
+                console.log(data); // Verificar qué datos están llegando
+
                 dniSpinner.style.display = 'none';
 
                 if (data.existe) {
@@ -302,7 +304,10 @@
                         cancelButtonText: 'Cancelar',
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            const obrasSocialesOptions = data.obrasSociales.map(obra => `<option value="${obra}"></option>`).join('');
+                            // Verifica si obrasSociales existe y es un arreglo antes de usar map
+                            const obrasSocialesOptions = Array.isArray(data.obrasSociales) 
+                                ? data.obrasSociales.map(obra => `<option value="${obra}"></option>`).join('') 
+                                : '';  // Si no existe o no es un arreglo, crea un string vacío
 
                             Swal.fire({
                                 title: 'Registrar Paciente',
@@ -344,6 +349,10 @@
                                             } else {
                                                 Swal.fire('Error', 'No se pudo registrar al paciente.', 'error');
                                             }
+                                        })
+                                        .catch(error => {
+                                            console.error('Error al registrar paciente:', error);
+                                            Swal.fire('Error', 'Ocurrió un error al registrar al paciente.', 'error');
                                         });
                                 }
                             });

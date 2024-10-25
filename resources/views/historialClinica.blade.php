@@ -14,21 +14,22 @@
             <ul class="space-y-2">
                 @foreach ($historiales as $historial)
                     <a href="#" class="block p-2 bg-cyan-600 text-white rounded hover:bg-cyan-800" onclick="mostrarHistorial({
-                                               id: {{ $historial->id }},
+                                                           id: {{ $historial->id }},
 
-                                               tension_arterial: '{{ $historial->tension_arterial }}',
-                                               peso: '{{ $historial->peso }}',
-                                               motivo_consulta: '{{ $historial->motivo_consulta }}',
-                                               datos_relevantes_examen_fisico: '{{ $historial->datos_relevantes_examen_fisico }}',
-                                               diagnostico: '{{ $historial->diagnostico }}',
-                                               tratamiento_indicaciones: '{{ $historial->tratamiento_indicaciones }}',
-                                               documentacion: '{{ $historial->documentacion }}',
-                                               created_at: '{{ $historial->created_at->format('d/m/Y H:i') }}'
-                                           })">Historial del {{ $historial->created_at->format('d/m/Y H:i') }}</a>
-                                           
+                                                           tension_arterial: '{{ $historial->tension_arterial }}',
+                                                           peso: '{{ $historial->peso }}',
+                                                           motivo_consulta: '{{ $historial->motivo_consulta }}',
+                                                           datos_relevantes_examen_fisico: '{{ $historial->datos_relevantes_examen_fisico }}',
+                                                           diagnostico: '{{ $historial->diagnostico }}',
+                                                           tratamiento_indicaciones: '{{ $historial->tratamiento_indicaciones }}',
+                                                           documentacion: '{{ $historial->documentacion }}',
+                                                           created_at: '{{ $historial->created_at->format('d/m/Y H:i') }}'
+                                                       })">Historial del
+                        {{ $historial->created_at->format('d/m/Y H:i') }}</a>
+
 
                 @endforeach
-                
+
             </ul>
             <button class="mt-4 w-full bg-green-600 text-white py-2 rounded hover:bg-green-800"
                 onclick="crearNuevoHistorial()">Crear Nuevo Historial</button>
@@ -61,9 +62,25 @@
                 @elseif($pacienteNoLogueado)
                     <p><strong>Nombre:</strong> {{ $pacienteNoLogueado->name }}</p>
                     <p><strong>DNI:</strong> {{ $pacienteNoLogueado->dni }}</p>
-                    <p><strong>Teléfono:</strong> {{ $pacienteNoLogueado->telefono }}</p>
+                    <p><strong>Teléfono:</strong> {{ $pacienteNoLogueado->telefono ?? 'No completado' }}</p>
                     <p><strong>Obra Social:</strong> {{ $pacienteNoLogueado->obra_social }}</p>
-                    <p><strong>Número de Afiliado:</strong> {{ $pacienteNoLogueado->numero_afiliado }}</p>
+                    <p><strong>Número de Afiliado:</strong> {{ $pacienteNoLogueado->numero_afiliado ?? 'No completado' }}
+                    </p>
+
+                    @if(!$pacienteNoLogueado->telefono || !$pacienteNoLogueado->direccion || !$pacienteNoLogueado->numero_afiliado)
+                        <!-- Botón para completar los campos faltantes solo si falta alguno -->
+                        <button id="completarCampos"
+                            class="flex items-center px-4 py-2 text-white bg-yellow-500 rounded hover:bg-yellow-600 transition mb-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                                stroke="currentColor" class="w-6 h-6 mr-2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L10.582 16.07a4.5 4.5 0 0 1-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 0 1 1.13-1.897l8.932-8.931Zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0 1 15.75 21H5.25A2.25 2.25 0 0 1 3 18.75V8.25A2.25 2.25 0 0 1 5.25 6H10" />
+                            </svg>
+                            Completar Campos Faltantes
+                        </button>
+
+                    @endif
+
                     <a href="{{ route('paciente.historiales.descargar', $pacienteNoLogueado->dni) }}"
                         class="flex items-center px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 transition">
                         <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"
@@ -73,9 +90,6 @@
                         </svg>
                         Descargar Historial Clínico Completo
                     </a>
-
-
-
                 @endif
             </div>
 
@@ -188,9 +202,91 @@
 </div>
 
 <script>
+    @if(isset($pacienteNoLogueado))
+        document.getElementById('completarCampos').addEventListener('click', function () {
+            let telefono = "{{ $pacienteNoLogueado->telefono ?? '' }}";
+            let direccion = "{{ $pacienteNoLogueado->direccion ?? '' }}";
+            let numeroAfiliado = "{{ $pacienteNoLogueado->numero_afiliado ?? '' }}";
+            let dni = "{{ $pacienteNoLogueado->dni }}";
+
+            let inputs = '';
+            if (!telefono) {
+                inputs += '<input id="swal-telefono" class="swal2-input" placeholder="Teléfono">';
+            }
+            if (!direccion) {
+                inputs += '<input id="swal-direccion" class="swal2-input" placeholder="Dirección">';
+            }
+            if (!numeroAfiliado) {
+                inputs += '<input id="swal-numero-afiliado" class="swal2-input" placeholder="Número de Afiliado">';
+            }
+
+            if (inputs === '') {
+                Swal.fire('Todos los campos ya están completos.');
+                return;
+            }
+
+            Swal.fire({
+                title: 'Completar datos del paciente',
+                html: inputs,
+                focusConfirm: false,
+                showCancelButton: true,
+                confirmButtonText: 'Guardar',
+                cancelButtonText: 'Volver',
+                preConfirm: () => {
+                    let telefonoInput = document.getElementById('swal-telefono') ? document.getElementById('swal-telefono').value : null;
+                    let direccionInput = document.getElementById('swal-direccion') ? document.getElementById('swal-direccion').value : null;
+                    let numeroAfiliadoInput = document.getElementById('swal-numero-afiliado') ? document.getElementById('swal-numero-afiliado').value : null;
+
+                    if (!telefonoInput && !direccionInput && !numeroAfiliadoInput) {
+                        Swal.showValidationMessage('Debe completar al menos un campo.');
+                        return false;
+                    }
+
+                    return {
+                        telefono: telefonoInput,
+                        direccion: direccionInput,
+                        numero_afiliado: numeroAfiliadoInput
+                    };
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let data = result.value;
+
+                    fetch('{{ route("pacienteNoLogueado.completar") }}', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                        },
+                        body: JSON.stringify({
+                            dni: dni,
+                            telefono: data.telefono,
+                            direccion: data.direccion,
+                            numero_afiliado: data.numero_afiliado
+                        })
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                Swal.fire('Éxito', data.message, 'success').then(() => {
+                                    location.reload(); // Recargar la página para ver los cambios
+                                });
+                            } else {
+                                Swal.fire('Error', 'Ocurrió un error al guardar los datos.', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire('Error', 'Ocurrió un error al completar los campos.', 'error');
+                        });
+                }
+            });
+        });
+    @endif
+
     function mostrarHistorial(historial) {
         const historialId = historial.id;
-        console.log("Historial ID:", historialId); 
+        console.log("Historial ID:", historialId);
 
         document.getElementById('historialIdDisplay').value = historialId;
 
@@ -247,7 +343,7 @@
                 a.href = "/consultorio/public/" + doc;
                 a.target = "_blank";
                 a.classList.add('text-blue-600', 'hover:underline');
-                a.textContent = doc.split('/').pop(); 
+                a.textContent = doc.split('/').pop();
                 li.appendChild(a);
                 listaDocumentos.appendChild(li);
             });

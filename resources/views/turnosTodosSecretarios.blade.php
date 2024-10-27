@@ -289,8 +289,9 @@ function imprimirTurnos() {
 
         const doc = iframe.contentWindow.document;
         doc.open();
-        doc.write('<html><head><title>Turnos solicitados</title><link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></head><body>');
-        doc.write(`<h2>${rangoFechas}</h2>`);
+        doc.write(`<html><head><title>${rangoFechas}</title><link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></head><body>`);
+
+doc.write(`<h3><strong>TURNOS:</strong></h3>`);
         doc.write('<hr>');
         doc.write(`<table class="min-w-full bg-white table-auto">${turnosVisibles}</table>`);
         doc.write('</body></html>');

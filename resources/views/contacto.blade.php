@@ -36,7 +36,7 @@
                     Teléfono
                 </h6>
                 <p class="block mb-0 font-sans text-base antialiased font-normal leading-relaxed text-gray-700">
-                +123 456 789
+                02656-492619
                 </p>
                 
             </div>

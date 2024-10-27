@@ -69,6 +69,9 @@
                                                         <br><small>Turnos en el año <strong>PAMI</strong>: <span
                                                                 style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
                                                     @endif
+                                                    <br>
+                                                    <small>Teléfono: <span
+                                                            style="font-weight:700">{{ $turno->paciente->user->telefono ?? 'No tiene' }}</span></small>
                                                 @else
                                                     {{ $turno->paciente_no_registrado_nombre }} <br>
                                                     <small>DNI: <span
@@ -78,6 +81,8 @@
                                                         <br><small>Turnos en el año: <span
                                                                 style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
                                                     @endif
+                                                    <br><small>Teléfono: <span
+                                                            style="font-weight:700">{{ $turno->paciente_no_registrado_telefono ?? 'No tiene' }}</span></small>
                                                 @endif
 
                                             </td>

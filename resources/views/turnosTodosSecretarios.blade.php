@@ -22,6 +22,33 @@
                 </button>
             </div>
         </div>
+        <div class="flex justify-center my-4">
+    <div class="relative w-full max-w-md">
+        <input id="fechaPicker" class="w-full py-2 px-4 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-teal-500" 
+               type="text" placeholder="Seleccionar fecha(s)">
+        <button onclick="limpiarFecha()" class="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-red-500 focus:outline-none">
+            &times;
+        </button>
+    </div>
+</div>
+
+<div class="flex justify-center space-x-4 my-4">
+<button onclick="filtrarTurnosPorFecha()" class="bg-teal-700 text-white py-2 px-4 rounded-lg hover:bg-teal-900 focus:outline-none focus:ring-2 focus:ring-teal-500">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline-block w-5 h-5 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99" />
+    </svg>
+    Filtrar Turnos
+</button>
+
+    <button onclick="imprimirTurnos()" class="bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="inline-block w-5 h-5 mr-2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.829c-.24.03-.48.062-.72.096m.72-.096a42.415 42.415 0 0 1 10.56 0m-10.56 0L6.34 18m10.94-4.171c.24.03.48.062.72.096m-.72-.096L17.66 18m0 0 .229 2.523a1.125 1.125 0 0 1-1.12 1.227H7.231c-.662 0-1.18-.568-1.12-1.227L6.34 18m11.318 0h1.091A2.25 2.25 0 0 0 21 15.75V9.456c0-1.081-.768-2.015-1.837-2.175a48.055 48.055 0 0 0-1.913-.247M6.34 18H5.25A2.25 2.25 0 0 1 3 15.75V9.456c0-1.081.768-2.015 1.837-2.175a48.041 48.041 0 0 1 1.913-.247m10.5 0a48.536 48.536 0 0 0-10.5 0m10.5 0V3.375c0-.621-.504-1.125-1.125-1.125h-8.25c-.621 0-1.125.504-1.125 1.125v3.659M18 10.5h.008v.008H18V10.5Zm-3 0h.008v.008H15V10.5Z" />
+    </svg>
+    Imprimir Turnos
+</button>
+
+</div>
+
 
         <div class="overflow-x-auto bg-white rounded-lg shadow-lg mt-10">
             <table class="min-w-full bg-white table-auto">
@@ -43,7 +70,7 @@
                 </thead>
                 <tbody id="turnosTableBody">
                     @php
-                        $orden = 1; // Inicializar contador de orden
+$orden = 1; // Inicializar contador de orden
                     @endphp
                     @forelse($turnos as $turno)
                                         <tr class="border-b block md:table-row" data-fecha="{{ $turno->dia_hora }}"
@@ -60,6 +87,9 @@
                                                         <br><small>Turnos en el año <strong>PAMI</strong>: <span
                                                                 style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
                                                     @endif
+                                                    <br>
+                                                    <small>Teléfono: <span
+                                                            style="font-weight:700">{{ $turno->paciente->user->telefono ?? 'No tiene' }}</span></small>
                                                 @else
                                                     {{ $turno->paciente_no_registrado_nombre }} <br>
                                                     <small>DNI: <span
@@ -68,8 +98,11 @@
                                                         <br><small>Turnos en el año: <span
                                                                 style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
                                                     @endif
+                                                    <br><small>Teléfono: <span
+                                                            style="font-weight:700">{{ $turno->paciente_no_registrado_telefono ?? 'No tiene' }}</span></small>
                                                 @endif
                                             </td>
+
                                             <td class="py-2 px-4 block md:table-cell" style="font-weight: 500;" data-label="Profesional">
                                                 {{ $turno->profesional?->user?->name ?? 'Profesional no disponible' }}
                                             </td>
@@ -78,7 +111,7 @@
                                             </td>
                                             <td class="py-2 px-4 block md:table-cell" data-label="Fecha y Hora">
                                                 @php
-                                                    $fechaHora = \Carbon\Carbon::parse($turno->dia_hora);
+    $fechaHora = \Carbon\Carbon::parse($turno->dia_hora);
                                                 @endphp
                                                 <strong>D:</strong> {{ $fechaHora->format('d/m/Y') }}<br>
                                                 <strong>H:</strong> {{ $fechaHora->format('H:i') }}
@@ -97,7 +130,8 @@
                                                             onclick="confirmarCancelacionSecretario({{ $turno->id }})">Cancelar turno</button>
 
                                                     </form>
-
+                                                    <button type="button" class="bg-blue-500 text-white py-1 px-3 rounded hover:bg-blue-700"
+                                                        onclick="imprimirTurno({{ $turno }})">Imprimir turno</button>
                                                 @else
                                                     <span class="text-gray-600" style="font-weight: 600;">{{ ucfirst($turno->estado) }}</span>
                                                 @endif
@@ -116,6 +150,25 @@
 </div>
 
 <style>
+    @media print {
+        /* Ocultar todo excepto el área de impresión */
+        body * {
+            visibility: hidden;
+        }
+
+        /* Mostrar solo el contenedor imprimible */
+        .printable, .printable * {
+            visibility: visible;
+        }
+
+        /* Establece el área de impresión como la tabla de turnos */
+        .printable {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+        }
+    }
     @media (max-width: 768px) {
 
         table,
@@ -152,6 +205,142 @@
 </style>
 
 <script>
+flatpickr("#fechaPicker", {
+    mode: "range",
+    dateFormat: "Y-m-d",
+    onClose: function(selectedDates, dateStr, instance) {
+        // Opcional: verificar si el usuario seleccionó algo o no
+        if (!dateStr) {
+            mostrarTodosLosTurnos();
+        }
+    }
+});
+
+function filtrarTurnosPorFecha() {
+    let fechasSeleccionadas = document.getElementById('fechaPicker').value.split(' to ');
+
+    let fechaInicio = new Date(fechasSeleccionadas[0]);
+    let fechaFin = fechasSeleccionadas[1] ? new Date(fechasSeleccionadas[1]) : fechaInicio;
+
+    let filas = document.querySelectorAll('#turnosTableBody tr');
+
+    filas.forEach(fila => {
+        let fechaTurno = new Date(fila.getAttribute('data-fecha'));
+
+        let fechaTurnoStr = fechaTurno.toISOString().split('T')[0];
+        let fechaInicioStr = fechaInicio.toISOString().split('T')[0];
+        let fechaFinStr = fechaFin.toISOString().split('T')[0];
+
+        if (fechaTurnoStr >= fechaInicioStr && fechaTurnoStr <= fechaFinStr) {
+            fila.style.display = '';
+        } else {
+            fila.style.display = 'none';
+        }
+    });
+}
+
+function limpiarFecha() {
+    document.getElementById('fechaPicker').value = ''; // Limpiar el campo de fecha
+    mostrarTodosLosTurnos(); // Mostrar todos los turnos
+}
+
+function mostrarTodosLosTurnos() {
+    let filas = document.querySelectorAll('#turnosTableBody tr');
+    filas.forEach(fila => {
+        fila.style.display = ''; // Mostrar todas las filas
+    });
+}
+
+
+function imprimirTurnos() {
+    // Obtener el rango de fechas seleccionado
+    let fechasSeleccionadas = document.getElementById('fechaPicker').value.split(' to ');
+    let fechaInicio = fechasSeleccionadas[0] || '';
+    let fechaFin = fechasSeleccionadas[1] || '';
+
+    // Determinar el título según las fechas seleccionadas
+    let rangoFechas = fechaInicio 
+        ? `Turnos dados en la fecha: ${fechaFin ? `${fechaInicio} al ${fechaFin}` : fechaInicio}` 
+        : 'Turnos totales';
+
+    let turnosVisibles = '';
+    let filas = document.querySelectorAll('#turnosTableBody tr');
+
+    filas.forEach(fila => {
+        if (fila.style.display !== 'none') {
+            let filaClone = fila.cloneNode(true);
+
+            // Remover las celdas de "estado" y "turnos en el año"
+            let estadoCell = filaClone.querySelector('[data-label="Estado"]');
+            if (estadoCell) estadoCell.remove();
+
+            turnosVisibles += filaClone.outerHTML;
+        }
+    });
+
+    if (turnosVisibles) {
+        // Crear un iframe para imprimir
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.style.border = 'none';
+        document.body.appendChild(iframe);
+
+        const doc = iframe.contentWindow.document;
+        doc.open();
+        doc.write('<html><head><title>Turnos solicitados</title><link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></head><body>');
+        doc.write(`<h2>${rangoFechas}</h2>`);
+        doc.write('<hr>');
+        doc.write(`<table class="min-w-full bg-white table-auto">${turnosVisibles}</table>`);
+        doc.write('</body></html>');
+        doc.close();
+
+        iframe.contentWindow.focus();
+        iframe.contentWindow.print();
+
+        setTimeout(() => document.body.removeChild(iframe), 1000);
+    } else {
+        alert('No hay turnos para imprimir.');
+    }
+}
+
+
+    function imprimirTurno(turno) {
+    const contenido = `
+        <div class="p-6 bg-white rounded-lg shadow-md">
+            <h1 class="text-2xl font-bold mb-4">Datos del turno reservado</h1>
+            <p class="text-lg"><strong>Paciente:</strong> ${turno.paciente ? turno.paciente.user.name : turno.paciente_no_registrado_nombre}</p>
+            <p class="text-lg"><strong>DNI:</strong> ${turno.paciente ? turno.paciente.user.dni : turno.dni_paciente_no_registrado}</p>
+            <p class="text-lg"><strong>Telefono:</strong> ${turno.paciente ? turno.paciente.user.telefono : (turno.paciente_no_registrado_telefono || '---')}</p>
+            <p class="text-lg"><strong>Profesional:</strong> ${turno.profesional ? turno.profesional.user.name : 'Profesional no disponible'}</p>
+            <p class="text-lg"><strong>Especialidad:</strong> ${turno.profesional ? turno.profesional.especialidad : 'Especialidad no disponible'}</p>
+            <p class="text-lg"><strong>Fecha:</strong> ${new Date(turno.dia_hora).toLocaleDateString()}</p>
+            <p class="text-lg"><strong>Hora:</strong> ${new Date(turno.dia_hora).toLocaleTimeString()}</p>
+        </div>
+    `;
+
+    const iframe = document.createElement('iframe');
+    iframe.style.position = 'absolute';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentWindow.document;
+    doc.open();
+    doc.write('<html><head><title>Reserva de turno</title><link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet"></head><body>');
+    doc.write(contenido);
+    doc.write('</body></html>');
+    doc.close();
+
+    iframe.contentWindow.focus();
+    iframe.contentWindow.print();
+
+    setTimeout(() => document.body.removeChild(iframe), 1000);
+}
+
+
     function confirmarCancelacionSecretario(turnoId) {
         Swal.fire({
             title: '¿Estás seguro?',

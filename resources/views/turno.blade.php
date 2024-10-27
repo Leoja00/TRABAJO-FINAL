@@ -319,6 +319,7 @@
                                         <datalist id="obras-sociales">
                                             ${obrasSocialesOptions}
                                         </datalist>
+                                        <input type="number" id="telefono" class="swal2-input" placeholder="Telefono">
                                     </div>
                                 `,
                                 showCancelButton: true,
@@ -327,6 +328,7 @@
                                 preConfirm: () => {
                                     const nombre = document.getElementById('nombre').value;
                                     const obraSocial = document.getElementById('obra-social').value;
+                                    const telefono = document.getElementById('telefono').value;
 
                                     if (!nombre) {
                                         Swal.showValidationMessage('Debe ingresar un nombre');
@@ -340,7 +342,7 @@
                                             'Content-Type': 'application/json',
                                             'X-CSRF-TOKEN': '{{ csrf_token() }}'
                                         },
-                                        body: JSON.stringify({ nombre: nombre, dni: dni, obra_social: obraSocial })
+                                        body: JSON.stringify({ nombre: nombre, dni: dni, obra_social: obraSocial,telefono:telefono })
                                     })
                                         .then(response => response.json())
                                         .then(data => {
@@ -432,6 +434,7 @@ function validarReserva(event) {
 
                 if (data.existe) {
                     confirmHtml += `<strong>Nombre del paciente:</strong> ${data.nombre}<br>`;
+                    confirmHtml += `<strong>Telefono:</strong> ${data.telefono}<br>`;
                     if (data.obraSocial === 'PAMI') {
                         confirmHtml += `<strong>Obra Social:</strong> ${data.obraSocial}<br>`;
                         confirmHtml += `<strong>Turnos en el año:</strong> ${data.turnosEnElAno} de 12. Al reservar, será el turno ${data.turnosEnElAno + 1} <br>`;

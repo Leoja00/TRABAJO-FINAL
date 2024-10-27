@@ -20,6 +20,7 @@ class PacienteNoLogueadoController extends Controller
         'dni' => $request->dni,
         'name' => $request->nombre,
         'obra_social' => $request->obra_social, 
+        'telefono'=>$request->telefono,
         'created_at' => now(),
         'updated_at' => now(),
     ]);

@@ -64,7 +64,7 @@
             const year = new Date().getFullYear();
             const copyrightElement = document.getElementById('copyright');
             copyrightElement.innerHTML =
-                `© ${year} <a href="https://github.com/Leoja00" target="_blank" class="hover:underline">Leonardo Gallardo</a>. Derechos reservados.`;
+                `© ${year} CDRM Derechos reservados.`;
         });
        
     </script>

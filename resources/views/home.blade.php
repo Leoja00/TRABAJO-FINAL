@@ -104,7 +104,7 @@
                     <p class="mb-4">Si prefieres hablar con alguien directamente, llama a nuestro número de atención al
                         cliente o visítanos en nuestro consultorio.</p>
                     <p class="text-lg font-semibold mb-4">Teléfono: <a href="tel:+123456789"
-                            class="text-yellow-300">+123 456 789</a></p>
+                            class="text-yellow-300">02656-492619</a></p>
                 </div>
             </div>
 

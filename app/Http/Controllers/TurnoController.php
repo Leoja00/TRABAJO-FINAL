@@ -24,51 +24,54 @@ class TurnoController extends Controller
     }
 
     public function verPacientesProfesional()
-{
-    $this->turnoService->actualizarTurnosCompletados();
-
-    if (!Auth::check() || Auth::user()->role !== 'profesional') {
-        return redirect()->route('home');
-    }
-
-    $isMobile = request()->header('User-Agent') && preg_match('/Mobile|Android|iPhone/', request()->header('User-Agent'));
-    $perPage = $isMobile ? 3 : 10;
-
-    $turnos = Auth::user()->profesional->turnos()->with(['paciente'])->paginate($perPage);
-
-    foreach ($turnos as $turno) {
-        if (!$turno->paciente && $turno->dni_paciente_no_registrado) {
-            // Buscar en la tabla 'pacientes_no_logueados' usando el DNI
-            $pacienteNoRegistrado = DB::table('pacientes_no_logueados')
-                ->where('dni', $turno->dni_paciente_no_registrado)
-                ->first();
-
-            if ($pacienteNoRegistrado) {
-                $turno->paciente_no_registrado_nombre = $pacienteNoRegistrado->name;
-
-                // Verificar si el paciente no registrado tiene PAMI y contar sus turnos en el año
-                if ($pacienteNoRegistrado->obra_social === 'PAMI') {
-                    $turno->turnosEnElAno = DB::table('turnos')
-                        ->where('dni_paciente_no_registrado', $pacienteNoRegistrado->dni)
+    {
+        $this->turnoService->actualizarTurnosCompletados();
+    
+        if (!Auth::check() || Auth::user()->role !== 'profesional') {
+            return redirect()->route('home');
+        }
+    
+        $isMobile = request()->header('User-Agent') && preg_match('/Mobile|Android|iPhone/', request()->header('User-Agent'));
+        $perPage = $isMobile ? 3 : 50;
+    
+        $turnos = Auth::user()->profesional->turnos()->with(['paciente'])->paginate($perPage);
+    
+        foreach ($turnos as $turno) {
+            if (!$turno->paciente && $turno->dni_paciente_no_registrado) {
+                // Buscar en la tabla 'pacientes_no_logueados' usando el DNI
+                $pacienteNoRegistrado = DB::table('pacientes_no_logueados')
+                    ->where('dni', $turno->dni_paciente_no_registrado)
+                    ->first();
+    
+                if ($pacienteNoRegistrado) {
+                    $turno->paciente_no_registrado_nombre = $pacienteNoRegistrado->name;
+                    $turno->paciente_no_registrado_telefono = $pacienteNoRegistrado->telefono ?? 'No tiene';
+    
+                    // Verificar si el paciente no registrado tiene PAMI y contar sus turnos en el año
+                    if ($pacienteNoRegistrado->obra_social === 'PAMI') {
+                        $turno->turnosEnElAno = DB::table('turnos')
+                            ->where('dni_paciente_no_registrado', $pacienteNoRegistrado->dni)
+                            ->whereYear('dia_hora', now()->year)
+                            ->count();
+                    }
+                } else {
+                    $turno->paciente_no_registrado_nombre = 'No Registrado';
+                    $turno->paciente_no_registrado_telefono = 'No tiene';
+                    $turno->turnosEnElAno = 0;
+                }
+            } else {
+                // Si el paciente está registrado y tiene PAMI, contar sus turnos en el año
+                if ($turno->paciente && $turno->paciente->obra_social === 'PAMI') {
+                    $turno->turnosEnElAno = $turno->paciente->turnos()
                         ->whereYear('dia_hora', now()->year)
                         ->count();
                 }
-            } else {
-                $turno->paciente_no_registrado_nombre = 'No Registrado';
-                $turno->turnosEnElAno = 0;
-            }
-        } else {
-            // Si el paciente está registrado y tiene PAMI, contar sus turnos en el año
-            if ($turno->paciente && $turno->paciente->obra_social === 'PAMI') {
-                $turno->turnosEnElAno = $turno->paciente->turnos()
-                    ->whereYear('dia_hora', now()->year)
-                    ->count();
             }
         }
+    
+        return view('pacientesAdheridosProfesional', compact('turnos'));
     }
-
-    return view('pacientesAdheridosProfesional', compact('turnos'));
-}
+    
 
 public function verPacientesHistorial()
 {
@@ -136,7 +139,7 @@ public function verPacientesHistorial()
 
 
 
-    public function verTurnosSecretarios()
+public function verTurnosSecretarios()
 {
     if (!Auth::check() || Auth::user()->role !== 'secretario') {
         return redirect()->route('home');
@@ -149,8 +152,8 @@ public function verPacientesHistorial()
     foreach ($turnos as $turno) {
         if ($turno->paciente) {
             $paciente = $turno->paciente;
+            $turno->paciente_telefono = $paciente->telefono; // Teléfono de paciente registrado
             if ($paciente->obra_social === 'PAMI') {
-                // Contar los turnos en el año
                 $turno->turnosEnElAno = $this->contarTurnosAnuales($paciente->id);
             }
         } elseif ($turno->dni_paciente_no_registrado) {
@@ -160,11 +163,13 @@ public function verPacientesHistorial()
 
             if ($pacienteNoRegistrado) {
                 $turno->paciente_no_registrado_nombre = $pacienteNoRegistrado->name;
+                $turno->paciente_no_registrado_telefono = $pacienteNoRegistrado->telefono; // Teléfono de paciente no registrado
                 if ($pacienteNoRegistrado->obra_social === 'PAMI') {
                     $turno->turnosEnElAno = $this->contarTurnosAnualesNoRegistrados($turno->dni_paciente_no_registrado);
                 }
             } else {
                 $turno->paciente_no_registrado_nombre = 'No Registrado';
+                $turno->paciente_no_registrado_telefono = 'No Disponible';
             }
         }
     }
@@ -175,12 +180,13 @@ public function verPacientesHistorial()
 
 
 
+
 public function verTurnos()
 {
     $this->turnoService->actualizarTurnosCompletados();
 
     $isMobile = request()->header('User-Agent') && preg_match('/Mobile|Android|iPhone/', request()->header('User-Agent'));
-    $perPage = $isMobile ? 3 : 10;
+    $perPage = $isMobile ? 3 : 50;
 
     $user = Auth::user();
     $turnos = $user->paciente->turnos()->with('profesional')->paginate($perPage);
@@ -407,6 +413,7 @@ public function cancelarTurnoSecretario($id)
         return response()->json([
             'existe' => true,
             'nombre' => $usuario->name,
+            'telefono' => $usuario->telefono, // Añadir el teléfono del usuario logueado
             'obraSocial' => $paciente->obra_social ?? null,
             'turnosEnElAno' => $turnosEnElAno,
             'obrasSociales' => $obrasSociales,  // Enviar las obras sociales al frontend
@@ -423,6 +430,7 @@ public function cancelarTurnoSecretario($id)
         return response()->json([
             'existe' => true,
             'nombre' => $pacienteNoLogueado->name,
+            'telefono' => $pacienteNoLogueado->telefono,  // Añadir el teléfono del paciente no logueado
             'obraSocial' => $pacienteNoLogueado->obra_social,
             'turnosEnElAno' => $turnosEnElAno,
             'obrasSociales' => $obrasSociales,  // Enviar las obras sociales al frontend

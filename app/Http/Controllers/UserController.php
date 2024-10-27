@@ -203,7 +203,7 @@ public function updateProfile(Request $request)
         'matricula' => 'nullable|string|max:50',
         'imagen' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         'obra_social' => 'nullable|string|max:100',
-        'numero_afiliado' => 'nullable|numeric|digits_between:8,10|required_if:obra_social,!SIN PREPAGA',
+        'numero_afiliado' => 'nullable|numeric|digits_between:8,10|required_if:obra_social,!SIN OBRA SOCIAL',
     ]);
 
     // Guardar campos generales solo si no están vacíos
@@ -249,7 +249,7 @@ public function updateProfile(Request $request)
         }
 
         // Si la obra social es SIN PREPAGA, dejar numero_afiliado en NULL
-        if ($request->input('obra_social') === 'SIN PREPAGA') {
+        if ($request->input('obra_social') === 'SIN OBRA SOCIAL') {
             $user->paciente->numero_afiliado = null;
         } else if ($request->filled('numero_afiliado')) {
             $user->paciente->numero_afiliado = $request->input('numero_afiliado');

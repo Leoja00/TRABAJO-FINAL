@@ -152,9 +152,13 @@ public function verTurnosSecretarios()
     foreach ($turnos as $turno) {
         if ($turno->paciente) {
             $paciente = $turno->paciente;
-            $turno->paciente_telefono = $paciente->telefono; // Teléfono de paciente registrado
+            $turno->paciente_telefono = $paciente->telefono;
+
+            // Solo contar turnos si la obra social es "PAMI"
             if ($paciente->obra_social === 'PAMI') {
                 $turno->turnosEnElAno = $this->contarTurnosAnuales($paciente->id);
+            } else {
+                $turno->turnosEnElAno = null; // No mostrar cantidad de turnos si no es PAMI
             }
         } elseif ($turno->dni_paciente_no_registrado) {
             $pacienteNoRegistrado = DB::table('pacientes_no_logueados')
@@ -163,19 +167,25 @@ public function verTurnosSecretarios()
 
             if ($pacienteNoRegistrado) {
                 $turno->paciente_no_registrado_nombre = $pacienteNoRegistrado->name;
-                $turno->paciente_no_registrado_telefono = $pacienteNoRegistrado->telefono; // Teléfono de paciente no registrado
+                $turno->paciente_no_registrado_telefono = $pacienteNoRegistrado->telefono;
+
+                // Solo contar turnos si la obra social es "PAMI"
                 if ($pacienteNoRegistrado->obra_social === 'PAMI') {
                     $turno->turnosEnElAno = $this->contarTurnosAnualesNoRegistrados($turno->dni_paciente_no_registrado);
+                } else {
+                    $turno->turnosEnElAno = null; // No mostrar cantidad de turnos si no es PAMI
                 }
             } else {
                 $turno->paciente_no_registrado_nombre = 'No Registrado';
                 $turno->paciente_no_registrado_telefono = 'No Disponible';
+                $turno->turnosEnElAno = null;
             }
         }
     }
 
     return view('turnosTodosSecretarios', compact('turnos'));
 }
+
 
 
 
@@ -327,7 +337,7 @@ public function cancelarTurnoSecretario($id)
                 'estado' => 'reservado',
             ]);
 
-            return redirect()->route('turnos.secretario')->with('success', 'Turno reservado con éxito para ' . $usuario->name . ' por el secretario.');
+            return redirect()->back()->with('success', 'Turno guardado exitosamente');   
         }
 
         // Guardar turno para un DNI no registrado
@@ -345,8 +355,7 @@ public function cancelarTurnoSecretario($id)
         ]);
 
 
-        return redirect()->route('turnos.secretario')->with('success', 'Turno reservado con éxito para DNI: ' . $dni . ' por el secretario.');
-    }
+        return redirect()->back()->with('success', 'Turno guardado exitosamente');    }
 
     /**
      * Guardar turno para el rol de paciente (usuario común)
@@ -482,27 +491,13 @@ public function cancelarTurnoSecretario($id)
 
         switch ($profesionalId) {
             case 1: // Adriana
-                if (in_array($diaSemana, [Carbon::MONDAY, Carbon::WEDNESDAY])) {
-                    // Adriana todo el día (mañana y tarde) LUNES Y MIERCOLES
-                    $bloques = [
-                        ['nombre' => 'manana', 'inicio' => '08:30', 'fin' => '12:30'],
-                        ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00'],
-                    ];
-                } elseif ($diaSemana === Carbon::THURSDAY) {
-                    // Adriana por la tarde JUEVES
-                    $bloques = [
-                        ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00'],
-                    ];
-                } elseif ($diaSemana === Carbon::FRIDAY) {
-                    // Adriana por la mañana VIERNES
-                    $bloques = [
-                        ['nombre' => 'manana', 'inicio' => '08:30', 'fin' => '12:30'],
-                    ];
-                } else {
-                    // No disponible en otros días
-                    return $horarios;
-                }
+                // Adriana todo el día (mañana y tarde) todos los días de la semana
+                $bloques = [
+                    ['nombre' => 'manana', 'inicio' => '08:30', 'fin' => '12:30'],
+                    ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00'],
+                ];
                 break;
+            
 
 
             case 3: // Psicólogo

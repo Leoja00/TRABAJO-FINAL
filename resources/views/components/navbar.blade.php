@@ -58,7 +58,7 @@
                                                         @php
                                                             $missingFields = [];
 
-                                                            if (Auth::user()->role === 'paciente' && Auth::user()->paciente->obra_social !== 'SIN PREPAGA') {
+                                                            if (Auth::user()->role === 'paciente' && Auth::user()->paciente->obra_social !== 'SIN OBRA SOCIAL') {
                                                                 if (is_null(Auth::user()->paciente->obra_social))
                                                                     $missingFields['Obra social'] = '';
                                                                 if (is_null(Auth::user()->paciente->numero_afiliado))

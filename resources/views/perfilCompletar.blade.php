@@ -147,13 +147,13 @@
 
                             @case('numero_afiliado')
                             <div class="mb-4" id="numero_afiliado_div"
-                                style="display: {{ old('obra_social', Auth::user()->paciente->obra_social) == 'SIN PREPAGA' ? 'none' : 'block' }}">
+                                style="display: {{ old('obra_social', Auth::user()->paciente->obra_social) == 'SIN OBRA SOCIAL' ? 'none' : 'block' }}">
                                 <label for="numero_afiliado">Número de Afiliado:</label>
                                 <input type="text" name="numero_afiliado" id="numero_afiliado"
                                     class="border rounded w-full py-2 px-3"
                                     value="{{ old('numero_afiliado', Auth::user()->paciente->numero_afiliado) }}"
                                     pattern="[0-9]{8,10}" title="Solo números, entre 8 y 10 caracteres"
-                                    {{ Auth::user()->paciente->obra_social == 'SIN PREPAGA' ? 'disabled' : '' }}>
+                                    {{ Auth::user()->paciente->obra_social == 'SIN OBRA SOCIAL' ? 'disabled' : '' }}>
                             </div>
 
 
@@ -190,7 +190,7 @@ function checkPrepaga() {
     const numeroAfiliadoInput = document.getElementById('numero_afiliado');
 
     // Verificar si se selecciona "SIN PREPAGA"
-    if (obraSocialInput.value === 'SIN PREPAGA') {
+    if (obraSocialInput.value === 'SIN OBRA SOCIAL') {
         numeroAfiliadoDiv.style.display = 'none'; // Ocultar el campo
         numeroAfiliadoInput.value = ''; // Limpiar el valor
         numeroAfiliadoInput.disabled = true; // Deshabilitar el campo

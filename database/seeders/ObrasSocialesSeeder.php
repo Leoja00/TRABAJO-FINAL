@@ -50,7 +50,7 @@ class ObrasSocialesSeeder extends Seeder
             ['nombre' => 'TV SALUD'],
             ['nombre' => 'UNIMED'],
             ['nombre' => 'UTA-OSCTCP'],
-            ['nombre' => 'SIN PREPAGA']
+            ['nombre' => 'SIN OBRA SOCIAL']
         ];
 
         foreach ($obras as $obra) {

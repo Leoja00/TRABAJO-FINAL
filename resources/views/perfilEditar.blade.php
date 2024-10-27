@@ -94,7 +94,7 @@
                                     class="border rounded w-full py-2 px-3"
                                     value="{{ old('numero_afiliado', Auth::user()->paciente->numero_afiliado) }}"
                                     pattern="[0-9]{8,10}" title="Solo números, entre 8 y 10 caracteres"
-                                    {{ Auth::user()->paciente->obra_social == 'SIN PREPAGA' ? 'disabled' : '' }}>
+                                    {{ Auth::user()->paciente->obra_social == 'SIN OBRA SOCIAL' ? 'disabled' : '' }}>
                             </div>
                             @endif
 
@@ -115,7 +115,7 @@ function checkPrepaga() {
     const obraSocialSelect = document.getElementById('obra_social');
     const numeroAfiliadoInput = document.getElementById('numero_afiliado');
 
-    if (obraSocialSelect.value === 'SIN PREPAGA') {
+    if (obraSocialSelect.value === 'SIN OBRA SOCIAL') {
         numeroAfiliadoInput.value = ''; // Limpiar el campo
         numeroAfiliadoInput.disabled = true; // Desactivar el campo
     } else {

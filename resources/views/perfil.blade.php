@@ -33,7 +33,7 @@
                 if (Auth::user()->role === 'paciente') {
                     if (is_null(Auth::user()->paciente->obra_social)) {
                         $missingFields[] = 'obra social';
-                    } else if (Auth::user()->paciente->obra_social !== 'SIN PREPAGA' &&
+                    } else if (Auth::user()->paciente->obra_social !== 'SIN OBRA SOCIAL' &&
                         is_null(Auth::user()->paciente->numero_afiliado)) {
 
                         $missingFields[] = 'número de afiliado';
@@ -134,7 +134,7 @@
                             <line x1="12" y1="7" x2="12" y2="11" />
                         </svg>
                         {{ ucfirst(Auth::user()->paciente->obra_social) }}
-                        @if(Auth::user()->paciente->obra_social !== 'SIN PREPAGA')
+                        @if(Auth::user()->paciente->obra_social !== 'SIN OBRA SOCIAL')
                             --- {{ ucfirst(Auth::user()->paciente->numero_afiliado) }}
                         @endif
                     </p>

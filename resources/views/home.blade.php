@@ -51,7 +51,7 @@
             if (is_null(Auth::user()->direccion)) $missingFieldsPaciente['Dirección'] = '';
         } else {
             // Verificar los campos del paciente según lo que ya tenías implementado
-            if (Auth::user()->paciente->obra_social !== 'SIN PREPAGA') {
+            if (Auth::user()->paciente->obra_social !== 'SIN OBRA SOCIAL') {
                 if (is_null(Auth::user()->paciente->obra_social)) $missingFieldsPaciente['Obra social'] = '';
                 if (is_null(Auth::user()->paciente->numero_afiliado)) $missingFieldsPaciente['Número de afiliado'] = '';
                 if (is_null(Auth::user()->telefono)) $missingFieldsPaciente['Teléfono'] = '';

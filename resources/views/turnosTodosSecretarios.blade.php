@@ -80,28 +80,23 @@ $orden = 1; // Inicializar contador de orden
                                                 <strong>{{ $orden++ }}</strong> <!-- Mostrar y luego incrementar el contador -->
                                             </td>
                                             <td class="py-2 px-4 block md:table-cell" style="font-weight: 500;" data-label="Paciente">
-                                                @if($turno->paciente)
-                                                    {{ $turno->paciente->user->name ?? 'Paciente no disponible' }} <br>
-                                                    <small>DNI: <span style="font-weight:700">{{ $turno->paciente->user->dni }}</span></small>
-                                                    @if($turno->paciente->obra_social === 'PAMI')
-                                                        <br><small>Turnos en el año <strong>PAMI</strong>: <span
-                                                                style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
-                                                    @endif
-                                                    <br>
-                                                    <small>Teléfono: <span
-                                                            style="font-weight:700">{{ $turno->paciente->user->telefono ?? 'No tiene' }}</span></small>
-                                                @else
-                                                    {{ $turno->paciente_no_registrado_nombre }} <br>
-                                                    <small>DNI: <span
-                                                            style="font-weight:700">{{ $turno->dni_paciente_no_registrado }}</span></small>
-                                                    @if($turno->paciente_no_registrado_nombre === 'PAMI')
-                                                        <br><small>Turnos en el año: <span
-                                                                style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
-                                                    @endif
-                                                    <br><small>Teléfono: <span
-                                                            style="font-weight:700">{{ $turno->paciente_no_registrado_telefono ?? 'No tiene' }}</span></small>
+                                            @if($turno->paciente)
+                                                {{ $turno->paciente->user->name ?? 'Paciente no disponible' }} <br>
+                                                <small>DNI: <span style="font-weight:700">{{ $turno->paciente->user->dni }}</span></small>
+                                                @if($turno->turnosEnElAno)
+                                                    <br><small>Turnos en el año <strong>PAMI</strong>: <span style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
                                                 @endif
-                                            </td>
+                                                <br>
+                                                <small>Teléfono: <span style="font-weight:700">{{ $turno->paciente->user->telefono ?? 'No tiene' }}</span></small>
+                                            @else
+                                                {{ $turno->paciente_no_registrado_nombre }} <br>
+                                                <small>DNI: <span style="font-weight:700">{{ $turno->dni_paciente_no_registrado }}</span></small>
+                                                @if($turno->turnosEnElAno)
+                                                    <br><small>Turnos en el año <strong>PAMI</strong>: <span style="font-weight:700">{{ $turno->turnosEnElAno }}</span></small>
+                                                @endif
+                                                <br><small>Teléfono: <span style="font-weight:700">{{ $turno->paciente_no_registrado_telefono ?? 'No tiene' }}</span></small>
+                                            @endif
+                                        </td>
 
                                             <td class="py-2 px-4 block md:table-cell" style="font-weight: 500;" data-label="Profesional">
                                                 {{ $turno->profesional?->user?->name ?? 'Profesional no disponible' }}

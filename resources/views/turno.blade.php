@@ -428,9 +428,12 @@ function validarReserva(event) {
             })
             .then(response => response.json())
             .then(data => {
+                const [year, month, day] = fecha.split("-");
+                const fechaFormateada = `${day}-${month}-${year}`;
+
                 let confirmHtml = `<strong>Profesional:</strong> ${document.querySelector("#profesional_id option:checked").textContent}<br>
-                                   <strong>Fecha:</strong> ${fecha}<br>
-                                   <strong>Hora:</strong> ${hora}<br>`;
+                                <strong>Fecha:</strong> ${fechaFormateada}<br>
+                                <strong>Hora:</strong> ${hora}<br>`;
 
                 if (data.existe) {
                     confirmHtml += `<strong>Nombre del paciente:</strong> ${data.nombre}<br>`;
@@ -474,12 +477,18 @@ function validarReserva(event) {
             });
         @else
             // Para los pacientes: confirmar el turno directamente sin verificación
-            // Suponemos que el paciente ya tiene su obra social y turnos en el año
-            const obraSocial = '{{ Auth::user()->paciente->obra_social }}'; // Cambia según tu lógica
-            const turnosEnElAno = {{ Auth::user()->paciente->turnos()->whereYear('dia_hora', now()->year)->count() }}; // Cambia según tu lógica
-            let confirmHtml = `<strong>Profesional:</strong> ${document.querySelector("#profesional_id option:checked").textContent}<br>
-                               <strong>Fecha:</strong> ${fecha}<br>
-                               <strong>Hora:</strong> ${hora}<br>`;
+        const [year, month, day] = fecha.split("-");
+        const fechaFormateada = `${day}-${month}-${year}`;
+
+        const obraSocial = '{{ Auth::user()->paciente->obra_social }}';
+        const turnosEnElAno = {{ Auth::user()->paciente->turnos()->whereYear('dia_hora', now()->year)->count() }};
+
+        let confirmHtml = `<strong>Profesional:</strong> ${document.querySelector("#profesional_id option:checked").textContent}<br>
+                        <strong>Fecha:</strong> ${fechaFormateada}<br>
+                        <strong>Hora:</strong> ${hora}<br>
+                        <strong>Obra Social:</strong> ${obraSocial}<br>
+                        <strong>Turnos en el año:</strong> ${turnosEnElAno}<br>`;
+
 
             if (obraSocial === 'PAMI') {
                 confirmHtml += `<strong>Obra Social:</strong> ${obraSocial}<br>`;

@@ -56,7 +56,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 4v16m8-8l-8 8-8-8" />
                         </svg>
-                        Descargar Historial Clínico Completo
+                        Descargar Historia Clínica Completa
                     </a>
 
                 @elseif($pacienteNoLogueado)
@@ -88,7 +88,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M12 4v16m8-8l-8 8-8-8" />
                         </svg>
-                        Descargar Historial Clínico Completo
+                        Descargar Historia Clínica Completa
                     </a>
                 @endif
             </div>

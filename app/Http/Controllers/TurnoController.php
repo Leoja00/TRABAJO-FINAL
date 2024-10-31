@@ -490,13 +490,36 @@ public function cancelarTurnoSecretario($id)
 
 
         switch ($profesionalId) {
+            /*POSIBLE CAMBIO EN UN FUTURO POR LO QUE ME DIJO LA DOCTORA
             case 1: // Adriana
                 // Adriana todo el día (mañana y tarde) todos los días de la semana
                 $bloques = [
                     ['nombre' => 'manana', 'inicio' => '08:30', 'fin' => '12:30'],
                     ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00'],
                 ];
-                break;
+                break;*/
+                case 1: // Adriana
+                    if ($diaSemana === Carbon::MONDAY || $diaSemana === Carbon::WEDNESDAY) {
+                        // Lunes y miércoles todo el día (mañana y tarde)
+                        $bloques = [
+                            ['nombre' => 'manana', 'inicio' => '08:30', 'fin' => '12:30'],
+                            ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00'],
+                        ];
+                    } elseif ($diaSemana === Carbon::THURSDAY) {
+                        // Jueves solo por la tarde
+                        $bloques = [
+                            ['nombre' => 'tarde', 'inicio' => '17:00', 'fin' => '20:00'],
+                        ];
+                    } elseif ($diaSemana === Carbon::FRIDAY) {
+                        // Viernes solo por la mañana
+                        $bloques = [
+                            ['nombre' => 'manana', 'inicio' => '08:30', 'fin' => '12:30'],
+                        ];
+                    } else {
+                        // Otros días no hay disponibilidad
+                        return $horarios;
+                    }
+                    break;
             
 
 

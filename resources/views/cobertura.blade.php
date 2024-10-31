@@ -15,7 +15,8 @@
                     aria-label="Search" id="search-input"
                     aria-describedby="search-button" />
                 <label for="search-input"
-                    class="pointer-events-none absolute left-3 top-0 mb-0 max-w-[90%] origin-[0_0] truncate pt-[0.37rem] leading-[1.6] text-white transition-all duration-200 ease-out peer-focus:-translate-y-[0.9rem] peer-focus:scale-[0.8] peer-focus:text-white">
+                    class="absolute left-3 top-[0.5rem] mb-0 text-white transition-all duration-200 ease-out origin-[0_0] scale-100 -translate-y-0
+                    peer-focus:-translate-y-[1.5rem] peer-focus:scale-75 peer-focus:text-white">
                     Buscar obra social
                 </label>
             </div>
@@ -45,11 +46,4 @@ function filterObras() {
 
 document.getElementById('search-input').addEventListener('keyup', filterObras);
 </script>
-
-<style>
-label {
-    pointer-events: none; 
-    z-index: 1; 
-}
-</style>
 @endsection

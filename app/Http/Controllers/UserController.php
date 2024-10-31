@@ -24,14 +24,16 @@ class UserController extends Controller
 {
     // Validación del registro
     $validator = Validator::make($request->all(), [
-        'name' => ['required', 'string', 'regex:/^[\pL\s]+$/u', 'max:255'], // Solo letras y espacios
-        'email' => 'required|string|email|max:255|unique:users', // Verifica que el correo sea único
-        'password' => 'required|string|min:6|confirmed', // Confirmed verifica que password_confirmation coincida
+        'name' => ['required', 'string', 'regex:/^[\pL\s]+$/u', 'max:255'],
+        'email' => 'required|string|email|max:255|unique:users',
+        'password' => 'required|string|min:6|confirmed',
     ], [
         'name.regex' => 'El nombre solo puede contener letras y espacios.',
-        'email.unique' => 'El correo ya está registrado.', 
+        'email.unique' => 'El correo ya está registrado.',
+        'password.min' => 'La contraseña debe tener al menos 6 caracteres.', // Mensaje en español
         'password.confirmed' => 'Las contraseñas no son iguales.',
     ]);
+    
 
     if ($validator->fails()) {
         return back()->withErrors($validator, 'register')->withInput()->with('signupError', true);

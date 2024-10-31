@@ -23,8 +23,8 @@
                             <div class="mb-4">
                                 <label for="telefono">Teléfono:</label>
                                 <input type="text" name="telefono" id="telefono" class="border rounded w-full py-2 px-3"
-                                    value="{{ old('telefono', Auth::user()->telefono) }}" pattern="[0-9]{6,10}"
-                                    title="Solo números, entre 6 y 10 caracteres">
+                                    value="{{ old('telefono', Auth::user()->telefono) }}" pattern="[0-9]{6,15}"
+                                    title="Solo números, entre 6 y 15 caracteres">
                             </div>
                             <div class="mb-4">
                                 <label for="fechaNacimiento">Fecha de Nacimiento:</label>

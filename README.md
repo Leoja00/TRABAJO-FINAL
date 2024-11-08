@@ -1,6 +1,27 @@
 ## CON RESPECTO A LA BD   
 Puse la <strong>BASE DE DATOS DE PRUEBA</strong>, no paso la que en esta en <strong>PRODUCCIÓN, POR TEMAS DE PRIVACIDAD DE LOS PACIENTES Y DEL CONSULTORIO.</strong><br>
-Se uso MYSQL
+Se uso MYSQL<br><br>
+
+<strong><u>TIPO DE USUARIOS</u></strong><br>
+#
+<strong>PACIENTE REGISTRADO: </strong><br>
+<u>CORREO:</u> leoja00@gmail.com <br>
+<u>CONTRASEÑA:</u> 123456 <br>
+#
+<strong>PROFESIONAL: </strong><br>
+<u>CORREO:</u> agm83@live.com.ar <br>
+<u>CONTRASEÑA:</u> 123456 <br>
+#
+<strong>SECRETARIA: </strong><br>
+<u>CORREO:</u> valeoluna@hotmail.com <br>
+<u>CONTRASEÑA:</u> 123456 <br>
+##
+<strong>ADMINISTRADOR: </strong><br>
+<u>CORREO:</u> admin@example.com <br>
+<u>CONTRASEÑA:</u> password123 <br>
+#
+
+
 ## Framework de CSS
 TAILWINDS
 ##

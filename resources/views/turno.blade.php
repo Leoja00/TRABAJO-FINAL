@@ -149,95 +149,119 @@
     });
 
     function fetchHorariosDisponibles(fecha) {
-        const profesionalId = document.getElementById('profesional_id').value;
-        document.getElementById('profesional_id-hidden').value = profesionalId;
+    const profesionalId = document.getElementById('profesional_id').value;
+    document.getElementById('profesional_id-hidden').value = profesionalId;
 
-        if (!profesionalId) {
-            Swal.fire({
-                icon: 'warning',
-                title: 'Atención',
-                text: 'Por favor selecciona un profesional primero.',
-            });
+    if (!profesionalId) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Atención',
+            text: 'Por favor selecciona un profesional primero.',
+        });
+        return;
+    }
+
+    // Mostrar el spinner
+    document.getElementById('spinner').style.display = 'block';
+
+    fetch('{{ route('getHorariosDisponibles') }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            fecha: fecha,
+            profesional_id: profesionalId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Ocultar el spinner
+        document.getElementById('spinner').style.display = 'none';
+
+        document.getElementById('manana-horarios').innerHTML = '';
+        document.getElementById('tarde-horarios').innerHTML = '';
+
+        // Deshabilitar el botón de reserva si no hay horarios disponibles
+        document.getElementById('reservar-btn').disabled = !data.horariosDisponibles.manana.length && !data.horariosDisponibles.tarde.length;
+
+        // Mensajes de disponibilidad por profesional
+        const mensajeHorarios = {
+            1: 'Este profesional atiende los lunes y miércoles en turno mañana y tarde, jueves en turno tarde, y viernes en turno mañana.',
+            2: 'Este profesional atiende los martes en turno tarde.',
+            3: 'Este profesional atiende los viernes en turno tarde.'
+        };
+
+        const mensajeProfesional = mensajeHorarios[profesionalId] || '';
+
+        // Si no hay horarios disponibles, mostrar mensaje de disponibilidad del profesional
+        if (!data.horariosDisponibles.manana.length && !data.horariosDisponibles.tarde.length) {
+            const noHorariosMsg = document.createElement('p');
+            noHorariosMsg.textContent = `No hay turnos disponibles para el día ${fecha}. ${mensajeProfesional}`;
+            noHorariosMsg.style.color = '#ffffff';
+            noHorariosMsg.style.textAlign = 'center';
+            noHorariosMsg.style.marginTop = '20px';
+            noHorariosMsg.style.padding = '10px';
+            noHorariosMsg.style.backgroundColor = '#ff5c5c'; 
+            noHorariosMsg.style.borderRadius = '8px';
+        
+            document.getElementById('manana-horarios').appendChild(noHorariosMsg);
             return;
         }
 
-        // Mostrar el spinner
-        document.getElementById('spinner').style.display = 'block';
+        // TURNO MAÑANA
+        const contenedorTurno = document.createElement('div');
+        contenedorTurno.className = 'border-2 border-white p-4 rounded-md mb-12';
 
-        fetch('{{ route('getHorariosDisponibles') }}', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': '{{ csrf_token() }}'
-            },
-            body: JSON.stringify({
-                fecha: fecha,
-                profesional_id: profesionalId
-            })
-        })
-            .then(response => response.json())
-            .then(data => {
-                // Ocultar el spinner
-                document.getElementById('spinner').style.display = 'none';
+        const mananaHeader = document.createElement('h3');
+        mananaHeader.textContent = 'Turno Mañana';
+        mananaHeader.className = 'text-lg font-bold mt-4 text-white';
+        contenedorTurno.appendChild(mananaHeader);
 
-                document.getElementById('manana-horarios').innerHTML = '';
-                document.getElementById('tarde-horarios').innerHTML = '';
+        data.horariosDisponibles.manana.forEach(function (hora) {
+            const button = document.createElement('button');
+            button.textContent = hora;
+            button.className = 'border border-gray-300 p-4 rounded-md w-24 text-center m-2 cursor-pointer hover:bg-teal-500 text-white';
+            button.onclick = function (event) {
+                event.preventDefault();
+                seleccionarHora(hora);
+            };
+            contenedorTurno.appendChild(button);
+        });
 
-                document.getElementById('reservar-btn').disabled = !data.horariosDisponibles.manana.length && !data.horariosDisponibles.tarde.length;
+        document.getElementById('manana-horarios').appendChild(contenedorTurno);
 
-                // TURNO MAÑANA
-                const contenedorTurno = document.createElement('div');
-                contenedorTurno.className = 'border-2 border-white p-4 rounded-md mb-12';
+        // TURNO TARDE
+        const contenedorTurnoTarde = document.createElement('div');
+        contenedorTurnoTarde.className = 'border-2 border-white p-4 rounded-md mb-4';
 
-                const mananaHeader = document.createElement('h3');
-                mananaHeader.textContent = 'Turno Mañana';
-                mananaHeader.className = 'text-lg font-bold mt-4 text-white';
-                contenedorTurno.appendChild(mananaHeader);
+        const tardeHeader = document.createElement('h3');
+        tardeHeader.textContent = 'Turno Tarde';
+        tardeHeader.className = 'text-lg font-bold mt-4 text-white';
+        contenedorTurnoTarde.appendChild(tardeHeader);
 
-                data.horariosDisponibles.manana.forEach(function (hora) {
-                    const button = document.createElement('button');
-                    button.textContent = hora;
-                    button.className = 'border border-gray-300 p-4 rounded-md w-24 text-center m-2 cursor-pointer hover:bg-teal-500 text-white';
-                    button.onclick = function (event) {
-                        event.preventDefault();
-                        seleccionarHora(hora);
-                    };
-                    contenedorTurno.appendChild(button);
-                });
+        data.horariosDisponibles.tarde.forEach(function (hora) {
+            const button = document.createElement('button');
+            button.textContent = hora;
+            button.className = 'border border-gray-300 p-4 rounded-md w-24 text-center m-2 cursor-pointer hover:bg-teal-500 text-white';
+            button.onclick = function (event) {
+                event.preventDefault();
+                seleccionarHora(hora);
+            };
+            contenedorTurnoTarde.appendChild(button);
+        });
 
-                document.getElementById('manana-horarios').appendChild(contenedorTurno);
+        document.getElementById('tarde-horarios').appendChild(contenedorTurnoTarde);
 
-                // TURNO TARDE
-                const contenedorTurnoTarde = document.createElement('div');
-                contenedorTurnoTarde.className = 'border-2 border-white p-4 rounded-md mb-4';
+    })
+    .catch(error => {
+        console.error('Error al obtener los horarios disponibles:', error);
+        document.getElementById('spinner').style.display = 'none';
+    });
+}
 
-                const tardeHeader = document.createElement('h3');
-                tardeHeader.textContent = 'Turno Tarde';
-                tardeHeader.className = 'text-lg font-bold mt-4 text-white';
-                contenedorTurnoTarde.appendChild(tardeHeader);
-
-                data.horariosDisponibles.tarde.forEach(function (hora) {
-                    const button = document.createElement('button');
-                    button.textContent = hora;
-                    button.className = 'border border-gray-300 p-4 rounded-md w-24 text-center m-2 cursor-pointer hover:bg-teal-500 text-white';
-                    button.onclick = function (event) {
-                        event.preventDefault();
-                        seleccionarHora(hora);
-                    };
-                    contenedorTurnoTarde.appendChild(button);
-                });
-
-                document.getElementById('tarde-horarios').appendChild(contenedorTurnoTarde);
-
-            })
-            .catch(error => {
-                console.error('Error al obtener los horarios disponibles:', error);
-
-                document.getElementById('spinner').style.display = 'none';
-            });
-    }
-
-    let horarioSeleccionado = null;
+let horarioSeleccionado = null;
 
     function seleccionarHora(hora) {
         if (horarioSeleccionado) {
